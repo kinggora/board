@@ -1,5 +1,4 @@
 <%@ page import="com.example.board.dao.CategoryDao" %>
-
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
@@ -71,7 +70,6 @@
             form.password2.select();
             return;
         }
-
         form.submit();
     }
 </script>
@@ -82,7 +80,7 @@
 <body>
 <h1>게시판 - 등록</h1>
 <div>
-<form name="write" method="post" action="/writeOK">
+<form name="write" method="post" action="/board/free/writeOK" enctype="multipart/form-data">
     <table>
         <tr>
             <td>카테고리</td>
@@ -112,7 +110,11 @@
         </tr>
         <tr>
             <td>파일 첨부</td>
-            <td><input type="text" name="file"/><input type="button" value="파일 찾기"></td>
+            <td>
+                <input type="file" name="file" /><br>
+                <input type="file" name="file" /><br>
+                <input type="file" name="file" />
+            </td>
         </tr>
     </table>
     <input type="button" value="취소">

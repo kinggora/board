@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public class PostViewDto {
 
     private int postId;
-    private int categoryId;
+    private String category;
     private String writer;
     private String title;
     private String content;
@@ -13,9 +13,9 @@ public class PostViewDto {
     private String modDate;
     private int hit;
 
-    public PostViewDto(int postId, int categoryId, String writer, String title, String content, String regDate, String modDate, int hit) {
+    public PostViewDto(int postId, String category, String writer, String title, String content, String regDate, String modDate, int hit) {
         this.postId = postId;
-        this.categoryId = categoryId;
+        this.category = category;
         this.writer = writer;
         this.title = title;
         this.content = content;
@@ -28,8 +28,8 @@ public class PostViewDto {
         return postId;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public String getCategory() {
+        return category;
     }
 
     public String getWriter() {

@@ -18,8 +18,8 @@ public class PostDao {
         PasswordEncryptor encryptor = new PasswordEncryptor();
         Map<String, String> encrypt = encryptor.encrypt(dto.getPassword());
 
-        String sql = "INSERT INTO POST(post_id, category_id, writer, title, content, salt, hash) " +
-                "VALUES(NULL, ?,?,?,?,?,?)";
+        String sql = "INSERT INTO POST(post_id, category_id, writer, title, content, reg_date, salt, hash) " +
+                "VALUES(NULL, ?,?,?,?,?,?,?)";
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
@@ -31,8 +31,9 @@ public class PostDao {
             ps.setString(2, dto.getWriter());
             ps.setString(3, dto.getTitle());
             ps.setString(4, dto.getContent());
-            ps.setString(5, encrypt.get("salt"));
-            ps.setString(6, encrypt.get("hash"));
+            ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+            ps.setString(6, encrypt.get("salt"));
+            ps.setString(7, encrypt.get("hash"));
 
             ps.executeUpdate();
             rs = ps.getGeneratedKeys();
@@ -51,28 +52,33 @@ public class PostDao {
         }
     }
 
-    public static PostViewDto findPost(int id){
-        String sql = "SELECT * FROM POST WHERE post_id=?";
+    public static PostViewDto findPost(String id){
+        String sql =
+                "SELECT * " +
+                "FROM POST p " +
+                    "JOIN CATEGORY c " +
+                    "ON p.category_id = c.category_id " +
+                "WHERE p.post_id=?";
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             ps = con.prepareStatement(sql);
-            ps.setInt(1, id);
+            ps.setString(1, id);
 
             rs = ps.executeQuery();
             rs.next();
 
             PostViewDto dto = new PostViewDto(
-                    rs.getInt("post_id"),
-                    rs.getInt("category_id"),
-                    rs.getString("writer"),
-                    rs.getString("title"),
-                    rs.getString("content"),
-                    timestampToString(rs.getTimestamp("reg_date")),
-                    timestampToString(rs.getTimestamp("mod_date")),
-                    rs.getInt("hit")
+                    rs.getInt("p.post_id"),
+                    rs.getString("c.name"),
+                    rs.getString("p.writer"),
+                    rs.getString("p.title"),
+                    rs.getString("p.content"),
+                    timestampToString(rs.getTimestamp("p.reg_date")),
+                    timestampToString(rs.getTimestamp("p.mod_date")),
+                    rs.getInt("p.hit")
             );
             return dto;
         } catch (SQLException e) {
