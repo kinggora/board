@@ -55,4 +55,12 @@ public class PostViewDto {
     public int getHit() {
         return hit;
     }
+
+    public void modifyDto(String writer, String title, String content){
+        if(writer != null) this.writer = writer;
+        if(title != null) this.title = title;
+        if(content != null) this.content = content;
+    }
+
+
 }

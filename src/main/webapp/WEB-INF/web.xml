@@ -32,12 +32,21 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>fileUpload</servlet-name>
-        <jsp-file>/utils/fileUpload.jsp</jsp-file>
+        <servlet-name>modify</servlet-name>
+        <jsp-file>/modify.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
-        <servlet-name>fileUpload</servlet-name>
-        <url-pattern>/utils/fileUpload</url-pattern>
+        <servlet-name>modify</servlet-name>
+        <url-pattern>/board/free/modify</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>modifyOK</servlet-name>
+        <jsp-file>/modifyOK.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>modifyOK</servlet-name>
+        <url-pattern>/board/free/modifyOK</url-pattern>
     </servlet-mapping>
 </web-app>
 

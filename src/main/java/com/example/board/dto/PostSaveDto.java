@@ -35,4 +35,6 @@ public class PostSaveDto {
     public String getContent() {
         return content;
     }
+
+
 }

@@ -3,6 +3,8 @@
 <%@ page import="com.example.board.dao.CommentDao" %>
 <%@ page import="com.example.board.dto.CommentDto" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.example.board.dao.FileDao" %>
+<%@ page import="com.example.board.dto.AttachFile" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
@@ -18,17 +20,33 @@
     PostViewDto post = PostDao.findPost(id);
     pageContext.setAttribute("p", post);
 
+    List<AttachFile> fileList = FileDao.findFile(id);
+    pageContext.setAttribute("fl", fileList);
+
     List<CommentDto> commentList = CommentDao.findComment(id);
-    pageContext.setAttribute("list", commentList);
+    pageContext.setAttribute("cl", commentList);
+
 %>
 <script type="text/javascript">
-    function checkForm(){
+    function createComment(){
         let form = document.commentForm;
         if(form.comment.value == ""){
             alert("댓글을 입력해주세요.");
             form.comment.select();
             return;
         }
+        return form.submit();
+    }
+
+    function modifyPost(){
+        let form = document.postIdForm;
+        form.action = "/board/free/modify";
+        return form.submit();
+    }
+
+    function deletePost(){
+        let form = document.postIdForm;
+        form.action = "/board/free/delete";
         return form.submit();
     }
 </script>
@@ -55,11 +73,16 @@
     ${p.content}<br><br >
 </dv>
 <dv>
-    첨부파일<br><br >
+    첨부파일<br>
+    <c:forEach var="f" items="${fl}">
+        <a href="${f.storeDir}${f.storeName}" download="${f.origName}" target=_blank>${f.origName}</a><br >
+    </c:forEach>
+    <br >
+    <br >
 </dv>
 <dv>
     <table>
-        <c:forEach var="c" items="${list}">
+        <c:forEach var="c" items="${cl}">
         <tr>
         ${c.regDate}<br >
         ${c.content}<br >
@@ -69,16 +92,19 @@
         <tr>
             <form name="commentForm" method="post">
                 <input type="text" name="comment"/>
-                <input type="button" value="등록" onclick="checkForm()"><br>
+                <input type="button" value="등록" onclick="createComment()"><br>
             </form>
         </tr>
     </table>
     ------------------------------------------------------------------------------------<br >
 </dv>
 <dv>
+    <form name="postIdForm" method="post">
+        <input type="hidden" name="id" value="${p.postId}"/>
+    </form>
     <input type="button" value="목록">
-    <input type="button" value="수정">
-    <input type="button" value="삭제">
+    <input type="button" value="수정" onclick="modifyPost()">
+    <input type="button" value="삭제" onclick="deletePost()">
 </dv>
 </body>
 </html>
