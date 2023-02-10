@@ -8,7 +8,7 @@
 
 <%
   String postId = request.getParameter("id");
-  PostViewDto post = PostDao.findPost(postId);
+  PostViewDto post = PostDao.findPostById(postId, false);
 
   //수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
   String writer = request.getParameter("writer");
@@ -72,6 +72,10 @@
 
     form.submit();
   }
+
+  function fileDelete(){
+
+  }
 </script>
 <html>
 <head>
@@ -113,9 +117,8 @@
         <td>파일 첨부</td>
         <td>
           <c:forEach var="f" items="${fl}">
-            ${f.origName}
-            <input type="button" name="download" value="Download"/>
-            <input type="button" name="remove" value="X"/><br>
+            ${f.origName}<a href="${f.storeDir}${f.storeName}" download="${f.origName}"><button>Download</button></a>
+              <input type="button" name="remove" value="X" onclick="fileDelete()" /><br>
           </c:forEach>
           <input type="file" name="file" /><br>
         </td>

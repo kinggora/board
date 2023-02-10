@@ -13,11 +13,7 @@
     String[] pathParts = pathInfo.split("/");
     String id = pathParts[1]; //{seq}
 
-    if(request.getParameter("comment") != null){
-        CommentDao.saveComment(id, request.getParameter("comment"));
-    }
-
-    PostViewDto post = PostDao.findPost(id);
+    PostViewDto post = PostDao.findPostById(id, true);
     pageContext.setAttribute("p", post);
 
     List<AttachFile> fileList = FileDao.findFile(id);
@@ -25,10 +21,17 @@
 
     List<CommentDto> commentList = CommentDao.findComment(id);
     pageContext.setAttribute("cl", commentList);
-
 %>
+
 <script type="text/javascript">
-    function createComment(){
+
+    function modifyPost(){
+        let form = document.modifyForm;
+        form.action = "/board/free/modify";
+        return form.submit();
+    }
+
+    function createCmt(){
         let form = document.commentForm;
         if(form.comment.value == ""){
             alert("댓글을 입력해주세요.");
@@ -38,42 +41,105 @@
         return form.submit();
     }
 
-    function modifyPost(){
-        let form = document.postIdForm;
-        form.action = "/board/free/modify";
+    function checkPassword(){
+        let form = document.deleteForm;
+        if(form.password.value == ""){
+            alert("비밀번호를 입력해주세요.");
+            form.password.select();
+            return;
+        }
         return form.submit();
     }
 
-    function deletePost(){
-        let form = document.postIdForm;
-        form.action = "/board/free/delete";
-        return form.submit();
+    function openPopup(){
+        document.getElementById("popup_layer").style.display="block";
+    }
+
+    function closePopup(){
+        document.getElementById("popup_layer").style.display="none";
     }
 </script>
+
 <html>
 <head>
     <title>게시</title>
     <style>
-        tr{
-            background-color: #e9e9e9;
-            padding: 10px 5px;
+        body { text-align: center; }
+        .wrapper {
+            width: 97%; margin: 0 auto; text-align: left;
+        }
+        table {
+            width: 100%;
+            border-top: 1px solid #444444;
+            border-collapse: collapse;
+        }
+        th, td {
+            border-bottom: 1px solid #444444;
+            padding: 10px;
+        }
+        input_wrap {
+            display: flex;
+            justify-content: flex-end;
+            width: 300px;
+        }
+        .input {
+            width: 90%;
+            height: 50px;
+        }
+        .comment_submit_btn {
+            border: 1px solid black;
+            background-color: white;
+            width: 100px;
+            height: 50px;
+            text-align: center;
+        }
+        .popup_layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            margin-top: -100px;
+            margin-left: -150px;
+            width: 300px;
+            height: 150px;
+            padding-bottom: 50px;
+            background: #fff;
+            z-index: 10;}
+        .popup_box{text-align: center;position: relative;top:50%;left:50%; overflow: auto; height: 200px; width:375px;transform:translate(-50%, -50%);z-index:1002;box-sizing:border-box;background:#fff;box-shadow: 2px 5px 10px 0px rgba(0,0,0,0.35);-webkit-box-shadow: 2px 5px 10px 0px rgba(0,0,0,0.35);-moz-box-shadow: 2px 5px 10px 0px rgba(0,0,0,0.35);}
+        .popup_box .popup_cont {padding:40px;line-height:1.4rem;font-size:14px; }
+        .btn_area{
+            padding-left: 20px;
+            display: table;
+            position: relative;
+            table-layout: fixed;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .btn_area > button{
+            border: 1px solid;
+            padding: 5px 5px;
+            color: #fff;
+            font-size: 14px;
+            background-color: gray;
+            box-sizing: border-box;
+            display: table-cell;
+            width: 35%;
+            margin-right: 5%;
+            cursor: pointer;
+            box-shadow: 0px 0px 8px -5px #000;
         }
     </style>
 </head>
 <body>
+<div class="wrapper">
 <h1>게시판 - 보기</h1>
-<dv>
-    ${p.writer} 등록일시 ${p.regDate} 수정일시 ${p.modDate}<br>
+<div style="float: left">${p.writer}</div>
+    <div style="float: right;">등록일시 ${p.regDate} &nbsp; &nbsp; &nbsp; &nbsp; 수정일시 ${p.modDate}</div><br><br>
+
+<div style="float: left">[${p.category}] ${p.title}</div><div style="float: right">조회수: ${p.hit}</div><br><br>
+<dv class="content">
+    <p>${p.content}</p>
 </dv>
 <dv>
-    [${p.category}] ${p.title} 조회수: ${p.hit}<br>
-    ------------------------------------------------------------------------------------<br >
-</dv>
-<dv>
-    ${p.content}<br><br >
-</dv>
-<dv>
-    첨부파일<br>
     <c:forEach var="f" items="${fl}">
         <a href="${f.storeDir}${f.storeName}" download="${f.origName}" target=_blank>${f.origName}</a><br >
     </c:forEach>
@@ -84,27 +150,51 @@
     <table>
         <c:forEach var="c" items="${cl}">
         <tr>
-        ${c.regDate}<br >
-        ${c.content}<br >
-        ------------------------------------------------------------------------------------<br >
+            <td>
+            ${c.regDate}<br>${c.content}<br>
+            </td>
         </tr>
         </c:forEach>
         <tr>
-            <form name="commentForm" method="post">
-                <input type="text" name="comment"/>
-                <input type="button" value="등록" onclick="createComment()"><br>
+            <td>
+            <form name="commentForm" method="post" action="/board/free/commentOK" onsubmit="return false">
+                <input type="hidden" name="id" value="${p.postId}"/>
+                <div class="input_wrap">
+                    <input class="input" type="text" name="comment" maxlength="499" placeholder="댓글을 입력해 주세요."/>
+                    <button class="comment_submit_btn" onclick="createCmt()">등록</button>
+                </div>
             </form>
+            </td>
         </tr>
     </table>
-    ------------------------------------------------------------------------------------<br >
 </dv>
 <dv>
-    <form name="postIdForm" method="post">
+    <form name="modifyForm" method="post">
         <input type="hidden" name="id" value="${p.postId}"/>
     </form>
-    <input type="button" value="목록">
+    <input type="button" value="목록" onclick="location.href='/boards/free/list'">
     <input type="button" value="수정" onclick="modifyPost()">
-    <input type="button" value="삭제" onclick="deletePost()">
+    <input type="button" value="삭제" onclick="openPopup()">
 </dv>
+
+<div class="popup_layer" id="popup_layer" style="display: none;">
+    <!--팝업-->
+    <div class="popup_box"> <!--팝업창-->
+        <div class="popup_cont"><!--텍스트 영역-->
+            <p class="text">
+                <form name="deleteForm" method="post" action="/board/free/deleteOK" onsubmit="return false">
+                    <input type="hidden" name="id" value="${p.postId}"/>
+                    비밀번호 <input type="password" name="password" placeholder="비밀번호를 입력해 주세요.">
+                </form>
+            </p>
+        </div>
+        <div class="btn_area"><!--버튼 영역-->
+            <button type="button" name="cancel" onclick="closePopup()">취소</button>
+            <button type="button" name="submit" onclick="checkPassword()">확인</button>
+        </div>
+    </div>
+    <div class="popup_dimmed"></div> <!--반투명 배경-->
+</div>
+</div>
 </body>
 </html>

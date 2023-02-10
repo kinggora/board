@@ -32,6 +32,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>commentOK</servlet-name>
+        <jsp-file>/commentOK.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>commentOK</servlet-name>
+        <url-pattern>/board/free/commentOK</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>modify</servlet-name>
         <jsp-file>/modify.jsp</jsp-file>
     </servlet>
@@ -47,6 +56,25 @@
     <servlet-mapping>
         <servlet-name>modifyOK</servlet-name>
         <url-pattern>/board/free/modifyOK</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>deleteOK</servlet-name>
+        <jsp-file>/deleteOK.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>deleteOK</servlet-name>
+        <url-pattern>/board/free/deleteOK</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>list</servlet-name>
+        <jsp-file>/list.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>list</servlet-name>
+        <url-pattern>/boards/free/list</url-pattern>
     </servlet-mapping>
 </web-app>
 

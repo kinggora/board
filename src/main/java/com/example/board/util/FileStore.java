@@ -32,6 +32,15 @@ public class FileStore {
         return files;
     }
 
+    public void deleteFiles(List<AttachFile> attachFiles){
+        for(AttachFile attachFile : attachFiles){
+            File file = new File(attachFile.getStoreDir() + attachFile.getStoreName());
+            if(file.exists()){
+                file.delete();
+            }
+        }
+    }
+
     private String createStoreFileName(String ext){
         return UUID.randomUUID() + "." + ext;
     }

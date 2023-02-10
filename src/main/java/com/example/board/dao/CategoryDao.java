@@ -9,7 +9,10 @@ import java.util.List;
 
 public class CategoryDao {
 
-    public List<Category> getCategories(){
+    private CategoryDao() {
+    }
+
+    public static List<Category> getCategories(){
         String sql = "SELECT * FROM CATEGORY";
 
         Connection con = DBConnector.getConnection();

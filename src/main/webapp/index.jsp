@@ -8,6 +8,7 @@
 <h1><%= "Hello World!" %>
 </h1>
 <br/>
-<a href="/board/free/write">게시물 등록</a>
+<a href="/board/free/write">게시물 등록</a><br>
+<a href="/boards/free/list">게시물 목록</a>
 </body>
 </html>

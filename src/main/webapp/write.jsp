@@ -1,10 +1,12 @@
 <%@ page import="com.example.board.dao.CategoryDao" %>
+<%@ page import="com.example.board.model.Category" %>
+<%@ page import="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
 <%
-    CategoryDao dao = new CategoryDao();
-    pageContext.setAttribute("categories", dao.getCategories());
+    List<Category> categories = CategoryDao.getCategories();
+    pageContext.setAttribute("categories", categories);
 %>
 <script type="text/javascript">
     function checkForm(){
@@ -97,8 +99,8 @@
         </tr>
         <tr>
             <td>비밀번호</td>
-            <td><input type="password" name="password"/>
-                <input type="password" name="password2"/></td>
+            <td><input type="password" name="password" placeholder="비밀번호"/>
+                <input type="password" name="password2" placeholder="비밀번호 확인"/></td>
         </tr>
         <tr>
             <td>제목</td>
