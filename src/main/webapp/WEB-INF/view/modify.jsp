@@ -142,7 +142,7 @@
         </td>
       </tr>
     </table>
-    <input type="button" value="취소" onclick="location.href='/boards/free/list'"/>
+    <input type="button" value="취소" onclick="location.href='/boards/free/view/'+${p.postId}"/>
     <input type="button" value="저장" onclick="checkForm()"/>
   </form>
 </div>

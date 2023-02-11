@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileDao {
+
+    private FileDao(){}
+
     public static void saveFile(int postId, List<AttachFile> files) {
 
         String sql = "INSERT INTO FILE(post_id, orig_name, store_name, ext, store_dir) " +

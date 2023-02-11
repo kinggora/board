@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CommentDao {
+
+    private CommentDao() {
+    }
+
     public static void saveComment(String postId, String content){
 
         String sql = "INSERT INTO COMMENT(post_id, content, reg_date) " +
