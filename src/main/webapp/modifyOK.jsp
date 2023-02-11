@@ -1,5 +1,11 @@
 <%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.dto.PostUpdateDto" %>
+<%@ page import="com.example.board.model.PostUpdateDto" %>
+<%@ page import="com.example.board.util.FileStore" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.example.board.dao.FileDao" %>
+<%@ page import="com.example.board.model.AttachFile" %>
+<%@ page import="com.example.board.validation.PostValidator" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
@@ -9,12 +15,35 @@
     String title = request.getParameter("title");
     String content = request.getParameter("content");
 
-    PostUpdateDto dto = new PostUpdateDto(postId, writer, password, title, content);
-    boolean updateResult = PostDao.updatePost(dto);
-    if(updateResult){
-        response.sendRedirect("/boards/free/view/" + postId);
+    if(PostValidator.modifyValidation(postId, writer, password, title, content)){
+        //POST update
+        PostUpdateDto dto = new PostUpdateDto(postId, writer, password, title, content);
+        boolean updateResult = PostDao.updatePost(dto);
+
+        //FILE update
+        if(updateResult){
+            List<Part> parts = new ArrayList<>();
+            for(Part p : request.getParts()){
+                if(p.getName().equals("file") && p.getSize() != 0){
+                    parts.add(p);
+                }
+            }
+
+            if(!parts.isEmpty()){
+                //파일 저장 (storage)
+                List<AttachFile> attachFiles = FileStore.storeFiles(parts);
+                //파일 정보 저장 (database)
+                FileDao.saveFile(Integer.parseInt(postId), attachFiles);
+            }
+
+            response.sendRedirect("/boards/free/view/" + postId);
+        } else {
+            pageContext.setAttribute("dto", dto);
+        }
     } else {
-        pageContext.setAttribute("dto", dto);
+        out.println("<script>alert('입력이 올바르지 않습니다.');" +
+                " window.location.href='/boards/free/list';</script>");
+        out.flush();
     }
 %>
 <html>

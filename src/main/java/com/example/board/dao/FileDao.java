@@ -1,8 +1,7 @@
 package com.example.board.dao;
 
 import com.example.board.DBConnector;
-import com.example.board.dto.AttachFile;
-import com.example.board.dto.PostViewDto;
+import com.example.board.model.AttachFile;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -77,5 +76,33 @@ public class FileDao {
             }
         }
     }
+
+//    public static boolean isAttached(List<String> idList){
+//        String sql = "SELECT EXISTS(SELECT * FROM FILE WHERE post_id=? LIMIT 1)";
+//        String sql = "SELECT COUNT(*) FROM FILE WHERE post_id IN (?, ?, ?, ?, ?, ?)"
+//
+//        Connection con = DBConnector.getConnection();
+//        PreparedStatement ps = null;
+//        ResultSet rs = null;
+//
+//        try {
+//            ps = con.prepareStatement(sql);
+//            ps.setString(1, id);
+//
+//            rs = ps.executeQuery();
+//            rs.next();
+//            return rs.getBoolean(1);
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        } finally {
+//            try{
+//                if(rs != null) rs.close();
+//                if(ps != null) ps.close();
+//                if(con != null) con.close();
+//            } catch (SQLException e){
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
 }

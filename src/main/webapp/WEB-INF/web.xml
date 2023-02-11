@@ -76,6 +76,17 @@
         <servlet-name>list</servlet-name>
         <url-pattern>/boards/free/list</url-pattern>
     </servlet-mapping>
+
+
+
+    <servlet>
+        <servlet-name>download</servlet-name>
+        <jsp-file>/download.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>download</servlet-name>
+        <url-pattern>/board/free/download.do</url-pattern>
+    </servlet-mapping>
 </web-app>
 
 

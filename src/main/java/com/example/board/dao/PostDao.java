@@ -1,14 +1,14 @@
 package com.example.board.dao;
 
 import com.example.board.DBConnector;
-import com.example.board.dto.AttachFile;
-import com.example.board.dto.PostSaveDto;
-import com.example.board.dto.PostUpdateDto;
-import com.example.board.dto.PostViewDto;
+import com.example.board.model.AttachFile;
+import com.example.board.model.PostSaveDto;
+import com.example.board.model.PostUpdateDto;
+import com.example.board.model.PostViewDto;
 import com.example.board.model.PageInfo;
 import com.example.board.model.PostSearch;
 import com.example.board.util.FileStore;
-import com.example.board.validation.PasswordEncryptor;
+import com.example.board.util.PasswordEncryptor;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -20,9 +20,6 @@ import java.util.Map;
 public class PostDao {
 
     private static final int PAGE_SIZE = 10;
-
-    public static final String SQL_UPDATE_POST_INC_HIT = "UPDATE POST SET hit=hit+1 WHERE post_id=?";
-    public static final String SQL_SELECT_POST_VIEW = "SELECT * FROM POST p JOIN CATEGORY c ON p.category_id=c.category_id WHERE p.post_id=?";
 
     private PostDao() {}
 
@@ -71,13 +68,15 @@ public class PostDao {
         ResultSet rs = null;
         try {
             if(hitUp){
-                ps = con.prepareStatement(SQL_UPDATE_POST_INC_HIT);
+                String updateSql = "UPDATE POST SET hit=hit+1 WHERE post_id=?";
+                ps = con.prepareStatement(updateSql);
                 ps.setString(1, id);
                 ps.executeQuery();
                 ps.close();
             }
 
-            ps = con.prepareStatement(SQL_SELECT_POST_VIEW);
+            String selectSql = "SELECT * FROM POST p JOIN CATEGORY c ON p.category_id=c.category_id WHERE p.post_id=?";
+            ps = con.prepareStatement(selectSql);
             ps.setString(1, id);
 
             rs = ps.executeQuery();
@@ -310,7 +309,7 @@ public class PostDao {
                     .append(searchWord)
                     .append("%')");
         }
-        sb.append(" ORDER BY p.post_id DESC");
+        sb.append(" ORDER BY p.reg_date DESC");
         sb.append(" LIMIT ").append(startRow).append(",").append(PAGE_SIZE);
 
         return sb.toString();

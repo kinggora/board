@@ -1,31 +1,27 @@
-package com.example.board.dto;
+package com.example.board.model;
 
-public class PostSaveDto {
+public class PostUpdateDto {
 
-    private int categoryId;
+    private String postId;
     private String writer;
     private String password;
     private String title;
     private String content;
 
-    public PostSaveDto(int categoryId, String writer, String password, String title, String content) {
-        this.categoryId = categoryId;
+    public PostUpdateDto(String postId, String writer, String password, String title, String content) {
+        this.postId = postId;
         this.writer = writer;
         this.password = password;
         this.title = title;
         this.content = content;
     }
 
-    public int getCategoryId() {
-        return categoryId;
+    public String getPostId() {
+        return postId;
     }
 
     public String getWriter() {
         return writer;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getTitle() {
@@ -34,6 +30,10 @@ public class PostSaveDto {
 
     public String getContent() {
         return content;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
 

@@ -15,13 +15,17 @@
     //삭제 성공 -> 게시판 목록 이동
     boolean deleteResult = PostDao.deletePost(id, password);
     if(deleteResult){
-        response.sendRedirect("/boards/free/list");
-    } else {
-        out.println("<script>alert('게시물 등록 시 입력한 비밀번호와 다릅니다.');" +
-                " window.location.href='/boards/free/view/" + id +"';</script>");
+        out.println("<script>alert('삭제되었습니다.'); window.location.href='/boards/free/list';</script>");
         out.flush();
+        //response.sendRedirect("");
+    } else{
+        pageContext.setAttribute("id", id);
     }
 %>
+<script>
+    alert('게시물 등록 시 입력한 비밀번호와 다릅니다.');
+    window.location.href='/boards/free/view/${id}';
+</script>
 <html>
 <head>
     <title>Title</title>

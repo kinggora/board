@@ -1,4 +1,4 @@
-package com.example.board.validation;
+package com.example.board.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PasswordEncryptor {
-
     private static final int SALT_SIZE = 16;
 
     public Map<String, String> encrypt(String pwd){

@@ -1,7 +1,7 @@
 <%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.dto.PostViewDto" %>
+<%@ page import="com.example.board.model.PostViewDto" %>
 <%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="com.example.board.dto.AttachFile" %>
+<%@ page import="com.example.board.model.AttachFile" %>
 <%@ page import="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
@@ -18,10 +18,8 @@
 
   pageContext.setAttribute("p", post);
 
-  //파일
   List<AttachFile> fileList = FileDao.findFile(postId);
   pageContext.setAttribute("fl", fileList);
-
 %>
 <script type="text/javascript">
   function checkForm(){
@@ -38,7 +36,6 @@
       form.writer.select();
       return;
     }
-
 
     if(form.password.value == ""){
       alert("등록할 때의 비밀번호를 입력해주세요.");
@@ -73,8 +70,22 @@
     form.submit();
   }
 
-  function fileDelete(){
+  function downloadPopup(id){
+    let popup = window.open("","myWindow","width=100, height=100");
+    let form = document.getElementById(id);
+    form.target="myWindow";
+    if (popup == null)
+      alert('차단된 팝업창을 허용해 주세요');
+    else{
+      form.submit();
+      popup.focus();
+    }
+    form.submit();
+  }
 
+  function deleteFile(obj) {
+    let div = $(obj).closest("div");
+    div.remove();
   }
 </script>
 <html>
@@ -84,7 +95,7 @@
 <body>
 <h1>게시판 - 수정</h1>
 <div>
-  <form name="modify" method="post" action="/board/free/modifyOK" enctype="multipart/form-data">
+  <form name="modify" method="post" action="/board/free/modifyOK" enctype="multipart/form-data" onsubmit="return false;">
     <table>
       <input type="hidden" name="id" value='${p.postId}'/>
       <tr>
@@ -117,15 +128,22 @@
         <td>파일 첨부</td>
         <td>
           <c:forEach var="f" items="${fl}">
-            ${f.origName}<a href="${f.storeDir}${f.storeName}" download="${f.origName}"><button>Download</button></a>
-              <input type="button" name="remove" value="X" onclick="fileDelete()" /><br>
+            <div>
+              <form method="post" id="${f.storeName}" action="/board/free/download.do">
+                <input type="hidden" name="storeName" value="${f.storeName}"/>
+                <input type="hidden" name="origName" value="${f.origName}"/>
+                <input type="hidden" name="storeDir" value="${f.storeDir}"/>
+                  ${f.origName}&nbsp;<input type="submit" value="Download" onclick="downloadPopup(${f.storeName});"/>
+              </form>
+              <input type="button" name="remove" value="X" onclick="deleteFile(this)" /><br>
+            </div>
           </c:forEach>
-          <input type="file" name="file" /><br>
+          <input type="file" name="file"/><br>
         </td>
       </tr>
     </table>
-    <input type="button" value="취소">
-    <input type="button" value="저장" onclick="checkForm()">
+    <input type="button" value="취소" onclick="location.href='/boards/free/list'"/>
+    <input type="button" value="저장" onclick="checkForm()"/>
   </form>
 </div>
 </body>

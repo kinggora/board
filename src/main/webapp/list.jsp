@@ -1,5 +1,5 @@
 <%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.dto.PostViewDto" %>
+<%@ page import="com.example.board.model.PostViewDto" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.board.dao.CategoryDao" %>
 <%@ page import="com.example.board.model.Category" %>
@@ -14,19 +14,18 @@
   String searchCategory = request.getParameter("c");
   String searchWord = request.getParameter("w");
 
-  System.out.println("currentPage = " + currentPage);
-  System.out.println("searchCategory = " + searchCategory);
-  System.out.println("searchWord = " + searchWord);
-
   PostSearch postSearch = new PostSearch(currentPage, searchCategory, searchWord);
 
   Map<String, Object> postMap = PostDao.findPosts(postSearch);
   List<PostViewDto> postList = (List<PostViewDto>)postMap.get("postList");
   pageContext.setAttribute("pl", postList);
 
+
+
   PageInfo pageInfo = (PageInfo) postMap.get("pageInfo");
   pageContext.setAttribute("pageInfo", pageInfo);
 
+  pageContext.setAttribute("p", postSearch.getPageNumber());
   pageContext.setAttribute("c", postSearch.getCategoryId());
   pageContext.setAttribute("w", postSearch.getSearchWord());
 
@@ -79,19 +78,20 @@
      color : #669;
    }
   a:visited {
-    color : #168;
+    color : purple;
   }
   a:hover {
-    color : #004;
+    color : purple;
   }
   a:active {
     color : green
   }
+
 </style>
 
 <body>
 <div class="wrapper">
-  <h1>자유 게시판 - 목록</h1>
+    <a class="title" style="text-decoration-line: none;" href="/boards/free/list"><h1>자유 게시판 - 목록</h1></a>
 <div>
   <form name="searchForm" onsubmit="return false">
     <select name="c">
@@ -104,7 +104,11 @@
     <button class="search_btn" onclick="search()">검색</button>
   </form>
 </div>
-<p>총 ${pageInfo.totalCount}건</p>
+<p><div style="float: left">총 ${pageInfo.totalCount}건</div>
+    <div style="float: right"><button onclick="location.href='/board/free/write'">등록</button> </div>
+    </p>
+    <br >
+    <br >
 <table class="blueone">
   <tr>
     <th>카테고리</th>
@@ -114,26 +118,57 @@
     <th>등록 일시</th>
     <th>수정 일시</th>
   </tr>
-  <c:forEach var="p" items="${pl}">
+  <c:forEach var="post" items="${pl}">
     <tr>
-      <td>${p.category}</td>
+      <td>${post.category}</td>
       <td style="text-align:left" colspan="5">
-        <a href="/boards/free/view/${p.postId}">
-          <c:set var="title" value="${p.title}"></c:set>
+        <a href="/boards/free/view/${post.postId}">
+          <c:set var="title" value="${post.title}"></c:set>
             ${fn:length(title) > 80 ? (fn:substring(title,0,80) += "...") : title}
         </a></td>
-      <td>${p.writer}</td>
-      <td>${p.hit}</td>
-      <td>${p.regDate}</td>
-      <td>${p.modDate}</td>
+      <td>${post.writer}</td>
+      <td>${post.hit}</td>
+      <td>${post.regDate}</td>
+      <td>${post.modDate}</td>
     </tr>
   </c:forEach>
 </table>
 <div style="text-align: center;font-size: 20px;">
   <p>
-<c:forEach var="n" begin="1" end="${pageInfo.pageCount}">
-  <a href="/boards/free/list?p=${n}&c=${c}&w=${w}">${n}</a>
-</c:forEach>
+<c:set var="startNum" value="${p-((p-1)%10)}"/>
+    <c:if test="${p != 1}">
+      <a href="?p=1&c=${c}&w=${w}"><<</a>
+    </c:if>
+    <c:if test="${p == 1}">
+      <a onclick="alert('첫 번째 페이지 입니다.')"><<</a>
+    </c:if>
+    &nbsp; &nbsp;
+    <c:if test="${startNum-10 > 0}">
+      <a href="?p=${startNum-10}&c=${c}&w=${w}"><</a>
+    </c:if>
+    <c:if test="${startNum-10 <= 0}">
+      <a onclick="alert('이전 페이지가 없습니다.')"><</a>
+    </c:if>
+    &nbsp; &nbsp;
+    <c:forEach var="i" begin="0" end="9">
+      <c:if test="${startNum+i <= pageInfo.pageCount}">
+        <a href="?p=${startNum+i}&c=${c}&w=${w}">${startNum+i}</a>
+      </c:if>
+    </c:forEach>
+    &nbsp; &nbsp;
+    <c:if test="${startNum+10 <= pageInfo.pageCount}">
+      <a href="?p=${startNum+10}&c=${c}&w=${w}">></a>
+    </c:if>
+    <c:if test="${startNum+10 > pageInfo.pageCount}">
+      <a onclick="alert('다음 페이지가 없습니다.')">></a>
+    </c:if>
+    &nbsp; &nbsp;
+    <c:if test="${p != pageInfo.pageCount}">
+      <a href="?p=${pageInfo.pageCount}&c=${c}&w=${w}">>></a>
+    </c:if>
+    <c:if test="${p == pageInfo.pageCount}">
+      <a onclick="alert('마지막 페이지 입니다.')">>></a>
+    </c:if>
   </p>
 </div>
 </div>

@@ -1,6 +1,6 @@
 package com.example.board.util;
 
-import com.example.board.dto.AttachFile;
+import com.example.board.model.AttachFile;
 
 import javax.servlet.http.Part;
 import java.io.File;
@@ -14,7 +14,7 @@ public class FileStore {
 
     private static String FILE_DIR = "C:/Users/HYUNA/IdeaProjects/board/build/libs/exploded/board-1.0-SNAPSHOT.war/upload";
 
-    public List<AttachFile> storeFiles(List<Part> parts) throws IOException {
+    public static List<AttachFile> storeFiles(List<Part> parts) throws IOException {
         List<AttachFile> files = new ArrayList<>();
         for(Part part : parts){
             InputStream is = part.getInputStream();
@@ -32,7 +32,7 @@ public class FileStore {
         return files;
     }
 
-    public void deleteFiles(List<AttachFile> attachFiles){
+    public static void deleteFiles(List<AttachFile> attachFiles){
         for(AttachFile attachFile : attachFiles){
             File file = new File(attachFile.getStoreDir() + attachFile.getStoreName());
             if(file.exists()){
@@ -41,11 +41,11 @@ public class FileStore {
         }
     }
 
-    private String createStoreFileName(String ext){
+    private static String createStoreFileName(String ext){
         return UUID.randomUUID() + "." + ext;
     }
 
-    private String extracted(String OrigFileName){
+    private static String extracted(String OrigFileName){
         int pos = OrigFileName.lastIndexOf(".");
         return OrigFileName.substring(pos+1);
     }

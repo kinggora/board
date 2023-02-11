@@ -1,10 +1,10 @@
 <%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.dto.PostViewDto" %>
+<%@ page import="com.example.board.model.PostViewDto" %>
 <%@ page import="com.example.board.dao.CommentDao" %>
-<%@ page import="com.example.board.dto.CommentDto" %>
+<%@ page import="com.example.board.model.CommentDto" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="com.example.board.dto.AttachFile" %>
+<%@ page import="com.example.board.model.AttachFile" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
@@ -141,7 +141,13 @@
 </dv>
 <dv>
     <c:forEach var="f" items="${fl}">
-        <a href="${f.storeDir}${f.storeName}" download="${f.origName}" target=_blank>${f.origName}</a><br >
+        <form method="post" id="${f.storeName}" action="/board/free/download.do">
+            <input type="hidden" name="storeName" value="${f.storeName}"/>
+            <input type="hidden" name="origName" value="${f.origName}"/>
+            <input type="hidden" name="storeDir" value="${f.storeDir}"/>
+            <input type="hidden" name="storeDir" value="${f.storeDir}"/>
+        </form>
+        <a href="" target=_blank onclick="document.getElementById('${f.storeName}').submit();">${f.origName}</a><br >
     </c:forEach>
     <br >
     <br >

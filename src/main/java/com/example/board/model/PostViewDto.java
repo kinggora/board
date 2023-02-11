@@ -1,4 +1,4 @@
-package com.example.board.dto;
+package com.example.board.model;
 
 import java.time.LocalDateTime;
 
@@ -61,6 +61,5 @@ public class PostViewDto {
         if(title != null) this.title = title;
         if(content != null) this.content = content;
     }
-
 
 }

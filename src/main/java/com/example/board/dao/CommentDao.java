@@ -1,12 +1,10 @@
 package com.example.board.dao;
 
 import com.example.board.DBConnector;
-import com.example.board.dto.CommentDto;
-import com.example.board.dto.PostViewDto;
+import com.example.board.model.CommentDto;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
