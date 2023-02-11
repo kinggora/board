@@ -84,7 +84,7 @@
   }
 
   function deleteFile(obj) {
-    let div = $(obj).closest("div");
+    let div = obj.closest("div");
     div.remove();
   }
 </script>
@@ -135,7 +135,7 @@
                 <input type="hidden" name="storeDir" value="${f.storeDir}"/>
                   ${f.origName}&nbsp;<input type="submit" value="Download" onclick="downloadPopup(${f.storeName});"/>
               </form>
-              <input type="button" name="remove" value="X" onclick="deleteFile(this)" /><br>
+              <input type="button" name="remove" value="X" onclick="deleteFile(this)"/><br>
             </div>
           </c:forEach>
           <input type="file" name="file"/><br>

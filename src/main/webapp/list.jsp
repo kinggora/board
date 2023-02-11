@@ -20,8 +20,6 @@
   List<PostViewDto> postList = (List<PostViewDto>)postMap.get("postList");
   pageContext.setAttribute("pl", postList);
 
-
-
   PageInfo pageInfo = (PageInfo) postMap.get("pageInfo");
   pageContext.setAttribute("pageInfo", pageInfo);
 

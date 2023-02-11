@@ -8,7 +8,6 @@ public class AttachFile {
         this.ext = ext;
         this.storeDir = storePath;
     }
-
     private String origName;
     private String storeName;
     private String ext;
