@@ -77,32 +77,43 @@ public class FileDao {
         }
     }
 
-//    public static boolean isAttached(List<String> idList){
-//        String sql = "SELECT EXISTS(SELECT * FROM FILE WHERE post_id=? LIMIT 1)";
-//        String sql = "SELECT COUNT(*) FROM FILE WHERE post_id IN (?, ?, ?, ?, ?, ?)"
-//
-//        Connection con = DBConnector.getConnection();
-//        PreparedStatement ps = null;
-//        ResultSet rs = null;
-//
-//        try {
-//            ps = con.prepareStatement(sql);
-//            ps.setString(1, id);
-//
-//            rs = ps.executeQuery();
-//            rs.next();
-//            return rs.getBoolean(1);
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        } finally {
-//            try{
-//                if(rs != null) rs.close();
-//                if(ps != null) ps.close();
-//                if(con != null) con.close();
-//            } catch (SQLException e){
-//                e.printStackTrace();
-//            }
-//        }
-//    }
+    public static boolean[] isAttached(Integer[] idList){
+        String sql = "SELECT EXISTS(SELECT * FROM FILE WHERE post_id=? LIMIT 1)";
+
+        Connection con = DBConnector.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        boolean[] isAttachedList = new boolean[idList.length];
+
+        try {
+            for(int i = 0; i < idList.length; i++){
+                ps = con.prepareStatement(sql);
+                ps.setInt(1, idList[i]);
+                rs = ps.executeQuery();
+                while (rs.next()){
+                    int result = rs.getInt(1);
+                    if(result==0){
+                        isAttachedList[i] = false;
+                    } else {
+                        isAttachedList[i] = true;
+                    }
+                }
+                ps.clearParameters();
+                rs.close();
+            }
+            return isAttachedList;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try{
+                if(rs != null) rs.close();
+                if(ps != null) ps.close();
+                if(con != null) con.close();
+            } catch (SQLException e){
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

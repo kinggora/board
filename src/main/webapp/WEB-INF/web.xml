@@ -6,7 +6,7 @@
 
     <servlet>
         <servlet-name>write</servlet-name>
-        <jsp-file>/write.jsp</jsp-file>
+        <jsp-file>/WEB-INF/view/write.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>write</servlet-name>
@@ -15,7 +15,7 @@
 
     <servlet>
         <servlet-name>view</servlet-name>
-        <jsp-file>/view.jsp</jsp-file>
+        <jsp-file>/WEB-INF/view/view.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>view</servlet-name>
@@ -24,7 +24,7 @@
 
     <servlet>
         <servlet-name>writeOK</servlet-name>
-        <jsp-file>/writeOK.jsp</jsp-file>
+        <jsp-file>/WEB-INF/service/writeOK.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>writeOK</servlet-name>
@@ -33,7 +33,7 @@
 
     <servlet>
         <servlet-name>commentOK</servlet-name>
-        <jsp-file>/commentOK.jsp</jsp-file>
+        <jsp-file>/WEB-INF/service/commentOK.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>commentOK</servlet-name>
@@ -42,7 +42,7 @@
 
     <servlet>
         <servlet-name>modify</servlet-name>
-        <jsp-file>/modify.jsp</jsp-file>
+        <jsp-file>/WEB-INF/view/modify.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>modify</servlet-name>
@@ -51,7 +51,7 @@
 
     <servlet>
         <servlet-name>modifyOK</servlet-name>
-        <jsp-file>/modifyOK.jsp</jsp-file>
+        <jsp-file>/WEB-INF/service/modifyOK.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>modifyOK</servlet-name>
@@ -60,7 +60,7 @@
 
     <servlet>
         <servlet-name>deleteOK</servlet-name>
-        <jsp-file>/deleteOK.jsp</jsp-file>
+        <jsp-file>/WEB-INF/service/deleteOK.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>deleteOK</servlet-name>
@@ -70,7 +70,7 @@
 
     <servlet>
         <servlet-name>list</servlet-name>
-        <jsp-file>/list.jsp</jsp-file>
+        <jsp-file>/WEB-INF/view/list.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>list</servlet-name>
@@ -81,7 +81,7 @@
 
     <servlet>
         <servlet-name>download</servlet-name>
-        <jsp-file>/download.jsp</jsp-file>
+        <jsp-file>/WEB-INF/service/download.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
         <servlet-name>download</servlet-name>

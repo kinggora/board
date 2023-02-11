@@ -221,6 +221,7 @@ public class PostDao {
                         timestampToString(rs.getTimestamp("p.mod_date")),
                         rs.getInt("p.hit")
                 );
+                dto.setAttached(rs.getString("f.post_id")!=null);
                 posts.add(dto);
             }
 
@@ -291,23 +292,53 @@ public class PostDao {
 
         int startRow = (pageNumber-1) * PAGE_SIZE;
 
-        String sql = "SELECT * FROM POST p JOIN CATEGORY c " +
-                "WHERE p.category_id=c.category_id";
+        boolean where = false;
+
+//        String sql = "SELECT * FROM POST p JOIN CATEGORY c " +
+//                "WHERE p.category_id=c.category_id";
+        String sql = "SELECT * FROM (SELECT post_id, category_id, writer, title, content, reg_date, mod_date, hit FROM POST) p " +
+                "LEFT JOIN (SELECT category_id, name FROM CATEGORY) c ON p.category_id=c.category_id " +
+                "LEFT JOIN (SELECT DISTINCT post_id FROM FILE) f ON f.post_id=p.post_id";
 
         StringBuilder sb = new StringBuilder(sql);
 
+//        if(categoryId.length() > 0){
+//            sb.append(" AND p.category_id=").append(categoryId);
+//        }
+//        //검색어가 공백문자나 빈 문자열이 아니고 2글자 이상
+//        if(!searchWord.isBlank() && searchWord.length() >= 2){
+//            sb.append(" AND (p.title LIKE '%")
+//                    .append(searchWord)
+//                    .append("%' OR p.writer LIKE '%")
+//                    .append(searchWord)
+//                    .append("%' OR p.content LIKE '%")
+//                    .append(searchWord)
+//                    .append("%')");
+//        }
         if(categoryId.length() > 0){
-            sb.append(" AND p.category_id=").append(categoryId);
+            sb.append(" WHERE p.category_id=").append(categoryId);
+            where = true;
         }
-        //검색어가 공백문자나 빈 문자열이 아니고 2글자 이상
-        if(!searchWord.isBlank() && searchWord.length() >= 2){
-            sb.append(" AND (p.title LIKE '%")
-                    .append(searchWord)
-                    .append("%' OR p.writer LIKE '%")
-                    .append(searchWord)
-                    .append("%' OR p.content LIKE '%")
-                    .append(searchWord)
-                    .append("%')");
+        if(where){
+            if(!searchWord.isBlank() && searchWord.length() >= 2){
+                sb.append(" AND (p.title LIKE '%")
+                        .append(searchWord)
+                        .append("%' OR p.writer LIKE '%")
+                        .append(searchWord)
+                        .append("%' OR p.content LIKE '%")
+                        .append(searchWord)
+                        .append("%')");
+            }
+        } else {
+            if(!searchWord.isBlank() && searchWord.length() >= 2){
+                sb.append(" WHERE p.title LIKE '%")
+                        .append(searchWord)
+                        .append("%' OR p.writer LIKE '%")
+                        .append(searchWord)
+                        .append("%' OR p.content LIKE '%")
+                        .append(searchWord)
+                        .append("%'");
+            }
         }
         sb.append(" ORDER BY p.reg_date DESC");
         sb.append(" LIMIT ").append(startRow).append(",").append(PAGE_SIZE);
@@ -323,3 +354,4 @@ public class PostDao {
         return new SimpleDateFormat("yyyy.MM.dd HH:mm").format(timestamp);
     }
 }
+

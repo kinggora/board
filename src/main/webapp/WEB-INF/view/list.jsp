@@ -6,6 +6,7 @@
 <%@ page import="com.example.board.model.PostSearch" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="com.example.board.model.PageInfo" %>
+<%@ page import="com.example.board.dao.FileDao" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -22,6 +23,10 @@
 
   PageInfo pageInfo = (PageInfo) postMap.get("pageInfo");
   pageContext.setAttribute("pageInfo", pageInfo);
+
+//  Integer[] idList = postList.stream().map(post -> post.getPostId()).toArray(Integer[]::new);
+//  boolean[] attached = FileDao.isAttached(idList);
+//  pageContext.setAttribute("attached", attached);
 
   pageContext.setAttribute("p", postSearch.getPageNumber());
   pageContext.setAttribute("c", postSearch.getCategoryId());
@@ -120,6 +125,9 @@
     <tr>
       <td>${post.category}</td>
       <td style="text-align:left" colspan="5">
+          <c:if test="${post.attached}">
+              <img src="../../resources/img/attach1.png"/>
+          </c:if>
         <a href="/boards/free/view/${post.postId}">
           <c:set var="title" value="${post.title}"></c:set>
             ${fn:length(title) > 80 ? (fn:substring(title,0,80) += "...") : title}

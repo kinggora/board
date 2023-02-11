@@ -13,6 +13,8 @@ public class PostViewDto {
     private String modDate;
     private int hit;
 
+    private boolean isAttached;
+
     public PostViewDto(int postId, String category, String writer, String title, String content, String regDate, String modDate, int hit) {
         this.postId = postId;
         this.category = category;
@@ -54,6 +56,14 @@ public class PostViewDto {
 
     public int getHit() {
         return hit;
+    }
+
+    public boolean isAttached() {
+        return isAttached;
+    }
+
+    public void setAttached(boolean attached) {
+        isAttached = attached;
     }
 
     public void modifyDto(String writer, String title, String content){
