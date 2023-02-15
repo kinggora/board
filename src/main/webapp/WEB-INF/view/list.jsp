@@ -1,36 +1,40 @@
 <%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.model.PostViewDto" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.example.board.dao.CategoryDao" %>
-<%@ page import="com.example.board.model.Category" %>
-<%@ page import="com.example.board.model.PostSearch" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="com.example.board.model.PageInfo" %>
 <%@ page import="com.example.board.dao.FileDao" %>
+<%@ page import="java.util.stream.Collectors" %>
+<%@ page import="com.example.board.model.*" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
-  String currentPage = request.getParameter("p");
-  String searchCategory = request.getParameter("c");
-  String searchWord = request.getParameter("w");
+  String currentPage = request.getParameter("page");
+  String searchCategory = request.getParameter("category");
+  String searchWord = request.getParameter("search_word");
 
-  PostSearch postSearch = new PostSearch(currentPage, searchCategory, searchWord);
+  PostSearch postSearch = PostSearch
+          .builder()
+          .pageNumber(currentPage)
+          .categoryId(searchCategory)
+          .searchWord(searchWord)
+          .build();
 
-  Map<String, Object> postMap = PostDao.findPosts(postSearch);
-  List<PostViewDto> postList = (List<PostViewDto>)postMap.get("postList");
-  pageContext.setAttribute("pl", postList);
+  PostListDto postListDto = PostDao.findPosts(postSearch);
+  List<PostViewDto> postList = postListDto.getPostList();
+  pageContext.setAttribute("postList", postList);
 
-  PageInfo pageInfo = (PageInfo) postMap.get("pageInfo");
+  PageInfo pageInfo = postListDto.getPageInfo();
   pageContext.setAttribute("pageInfo", pageInfo);
 
-//  Integer[] idList = postList.stream().map(post -> post.getPostId()).toArray(Integer[]::new);
-//  boolean[] attached = FileDao.isAttached(idList);
-//  pageContext.setAttribute("attached", attached);
+  List<String> idList = postList.stream()
+          .map(post -> String.valueOf(post.getPostId()))
+          .collect(Collectors.toList());
+  List<Integer> attachedList = FileDao.isAttached(idList);
+  pageContext.setAttribute("attachedList", attachedList);
 
-  pageContext.setAttribute("p", postSearch.getPageNumber());
-  pageContext.setAttribute("c", postSearch.getCategoryId());
-  pageContext.setAttribute("w", postSearch.getSearchWord());
+  pageContext.setAttribute("page", postSearch.getPageNumber());
+  pageContext.setAttribute("category", postSearch.getCategoryId());
+  pageContext.setAttribute("searchWord", postSearch.getSearchWord());
 
   List<Category> categories = CategoryDao.getCategories();
   pageContext.setAttribute("categories", categories);
@@ -43,7 +47,7 @@
 <script>
   function search(){
     let form = document.searchForm;
-    if(form.w.value.length < 2){
+    if(form.search_word.value.length < 2){
       alert("검색어를 2자 이상 입력해 주세요.");
       return;
     }
@@ -97,13 +101,13 @@
     <a class="title" style="text-decoration-line: none;" href="/boards/free/list"><h1>자유 게시판 - 목록</h1></a>
 <div>
   <form name="searchForm" onsubmit="return false">
-    <select name="c">
+    <select name="category">
       <option value="">전체 카테고리</option>
       <c:forEach var="c" items="${categories}">
         <option value="${c.id}">${c.name}</option>
       </c:forEach>
     </select>
-    <input type="text" name="w" style="width: 300px" placeholder="검색어를 입력해 주세요. (제목+작성자+내용)">
+    <input type="text" name="search_word" style="width: 300px" placeholder="검색어를 입력해 주세요. (제목+작성자+내용)">
     <button class="search_btn" onclick="search()">검색</button>
   </form>
 </div>
@@ -121,13 +125,16 @@
     <th>등록 일시</th>
     <th>수정 일시</th>
   </tr>
-  <c:forEach var="post" items="${pl}">
+  <c:forEach var="post" items="${postList}">
     <tr>
       <td>${post.category}</td>
       <td style="text-align:left" colspan="5">
-          <c:if test="${post.attached}">
-              <img src="../../resources/img/attach1.png"/>
-          </c:if>
+          <c:forEach var="attached" items="${attachedList}">
+              <c:if test="${post.postId eq attached}">
+                  <img src="../../resources/img/attach1.png"/>
+              </c:if>
+          </c:forEach>
+
         <a href="/boards/free/view/${post.postId}">
           <c:set var="title" value="${post.title}"></c:set>
             ${fn:length(title) > 80 ? (fn:substring(title,0,80) += "...") : title}
@@ -141,16 +148,16 @@
 </table>
 <div style="text-align: center;font-size: 20px;">
   <p>
-<c:set var="startNum" value="${p-((p-1)%10)}"/>
-    <c:if test="${p != 1}">
-      <a href="?p=1&c=${c}&w=${w}"><<</a>
+<c:set var="startNum" value="${page-((page-1)%10)}"/>
+    <c:if test="${page != 1}">
+      <a href="?page=1&category=${category}&search_word=${searchWord}"><<</a>
     </c:if>
-    <c:if test="${p == 1}">
+    <c:if test="${page == 1}">
       <a onclick="alert('첫 번째 페이지 입니다.')"><<</a>
     </c:if>
     &nbsp; &nbsp;
     <c:if test="${startNum-10 > 0}">
-      <a href="?p=${startNum-10}&c=${c}&w=${w}"><</a>
+      <a href="?page=${startNum-10}&category=${category}&search_word=${searchWord}"><</a>
     </c:if>
     <c:if test="${startNum-10 <= 0}">
       <a onclick="alert('이전 페이지가 없습니다.')"><</a>
@@ -158,21 +165,21 @@
     &nbsp; &nbsp;
     <c:forEach var="i" begin="0" end="9">
       <c:if test="${startNum+i <= pageInfo.pageCount}">
-        <a href="?p=${startNum+i}&c=${c}&w=${w}">${startNum+i}</a>
+        <a href="?page=${startNum+i}&category=${category}&search_word=${searchWord}">${startNum+i}</a>
       </c:if>
     </c:forEach>
     &nbsp; &nbsp;
     <c:if test="${startNum+10 <= pageInfo.pageCount}">
-      <a href="?p=${startNum+10}&c=${c}&w=${w}">></a>
+      <a href="?page=${startNum+10}&category=${category}&search_word=${searchWord}">></a>
     </c:if>
     <c:if test="${startNum+10 > pageInfo.pageCount}">
       <a onclick="alert('다음 페이지가 없습니다.')">></a>
     </c:if>
     &nbsp; &nbsp;
-    <c:if test="${p != pageInfo.pageCount}">
-      <a href="?p=${pageInfo.pageCount}&c=${c}&w=${w}">>></a>
+    <c:if test="${page != pageInfo.pageCount}">
+      <a href="?page=${pageInfo.pageCount}&category=${category}&search_word=${searchWord}">>></a>
     </c:if>
-    <c:if test="${p == pageInfo.pageCount}">
+    <c:if test="${page == pageInfo.pageCount}">
       <a onclick="alert('마지막 페이지 입니다.')">>></a>
     </c:if>
   </p>

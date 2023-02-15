@@ -17,7 +17,6 @@
     if(deleteResult){
         out.println("<script>alert('삭제되었습니다.'); window.location.href='/boards/free/list';</script>");
         out.flush();
-        //response.sendRedirect("");
     } else{
         pageContext.setAttribute("id", id);
     }

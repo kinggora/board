@@ -15,9 +15,18 @@
     String title = request.getParameter("title");
     String content = request.getParameter("content");
 
+    //Validation
     if(PostValidator.modifyValidation(postId, writer, password, title, content)){
         //POST update
-        PostUpdateDto dto = new PostUpdateDto(postId, writer, password, title, content);
+        PostUpdateDto dto = PostUpdateDto
+                .builder()
+                .postId(postId)
+                .writer(writer)
+                .password(password)
+                .title(title)
+                .content(content)
+                .build();
+
         boolean updateResult = PostDao.updatePost(dto);
 
         //FILE update

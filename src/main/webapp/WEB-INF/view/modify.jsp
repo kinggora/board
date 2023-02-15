@@ -8,7 +8,7 @@
 
 <%
   String postId = request.getParameter("id");
-  PostViewDto post = PostDao.findPostById(postId, false);
+  PostViewDto post = PostDao.findPostById(postId);
 
   //수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
   String writer = request.getParameter("writer");
@@ -16,10 +16,10 @@
   String content = request.getParameter("content");
   post.modifyDto(writer, title, content);
 
-  pageContext.setAttribute("p", post);
+  pageContext.setAttribute("post", post);
 
   List<AttachFile> fileList = FileDao.findFile(postId);
-  pageContext.setAttribute("fl", fileList);
+  pageContext.setAttribute("fileList", fileList);
 %>
 <script type="text/javascript">
   function checkForm(){
@@ -39,6 +39,13 @@
 
     if(form.password.value == ""){
       alert("등록할 때의 비밀번호를 입력해주세요.");
+      form.password.select();
+      return;
+    }
+
+    let regPass = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{4,16}$/;
+    if(!regPass.test(form.password.value)){
+      alert("비밀번호는 영문/숫자/특수문자를 포함하여 4글자 이상, 16글자 미만으로 입력해주세요.");
       form.password.select();
       return;
     }
@@ -97,20 +104,20 @@
 <div>
   <form name="modify" method="post" action="/board/free/modifyOK" enctype="multipart/form-data" onsubmit="return false;">
     <table>
-      <input type="hidden" name="id" value='${p.postId}'/>
+      <input type="hidden" name="id" value='${post.postId}'/>
       <tr>
         <td>카테고리</td>
-        <td>${p.category}</td>
+        <td>${post.category}</td>
       </tr>
       <tr>
         <td>등록 일시</td>
-        <td>${p.regDate}</td>
+        <td>${post.regDate}</td>
       </tr>
         <td>수정 일시</td>
-        <td>${p.modDate}</td>
+        <td>${post.modDate}</td>
       <tr>
         <td>작성자</td>
-        <td><input type="text" name="writer" value="${p.writer}"/></td>
+        <td><input type="text" name="writer" value="${post.writer}"/></td>
       </tr>
       <tr>
         <td>비밀번호</td>
@@ -118,22 +125,22 @@
       </tr>
       <tr>
         <td>제목</td>
-        <td><input type="text" name="title" value="${p.title}"/></td>
+        <td><input type="text" name="title" value="${post.title}"/></td>
       </tr>
       <tr>
         <td>내용</td>
-        <td><textarea name="content" cols="50" rows="10" >${p.content}</textarea></td>
+        <td><textarea name="content" cols="50" rows="10" >${post.content}</textarea></td>
       </tr>
       <tr>
         <td>파일 첨부</td>
         <td>
-          <c:forEach var="f" items="${fl}">
+          <c:forEach var="file" items="${fileList}">
             <div>
-              <form method="post" id="${f.storeName}" action="/board/free/download.do">
-                <input type="hidden" name="storeName" value="${f.storeName}"/>
-                <input type="hidden" name="origName" value="${f.origName}"/>
-                <input type="hidden" name="storeDir" value="${f.storeDir}"/>
-                  ${f.origName}&nbsp;<input type="submit" value="Download" onclick="downloadPopup(${f.storeName});"/>
+              <form method="post" id="${file.storeName}" action="/board/free/download.do">
+                <input type="hidden" name="storeName" value="${file.storeName}"/>
+                <input type="hidden" name="origName" value="${file.origName}"/>
+                <input type="hidden" name="storeDir" value="${file.storeDir}"/>
+                  ${file.origName}&nbsp;<input type="submit" value="Download" onclick="downloadPopup(${file.storeName});"/>
               </form>
               <input type="button" name="remove" value="X" onclick="deleteFile(this)"/><br>
             </div>
@@ -142,7 +149,7 @@
         </td>
       </tr>
     </table>
-    <input type="button" value="취소" onclick="location.href='/boards/free/view/'+${p.postId}"/>
+    <input type="button" value="취소" onclick="location.href='/boards/free/view/'+${post.postId}"/>
     <input type="button" value="저장" onclick="checkForm()"/>
   </form>
 </div>

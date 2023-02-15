@@ -12,8 +12,7 @@ public class FileDao {
     private FileDao(){}
 
     public static void saveFile(int postId, List<AttachFile> files) {
-
-        String sql = "INSERT INTO FILE(post_id, orig_name, store_name, ext, store_dir) " +
+        String sql = "INSERT INTO file(post_id, orig_name, store_name, ext, store_dir) " +
                 "VALUES(?,?,?,?,?)";
 
         Connection con = DBConnector.getConnection();
@@ -34,18 +33,12 @@ public class FileDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try {
-                if (rs != null) rs.close();
-                if (ps != null) ps.close();
-                if (con != null) con.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
     }
 
     public static List<AttachFile> findFile(String id){
-        String sql = "SELECT * FROM File WHERE post_id=?";
+        String sql = "SELECT * FROM file WHERE post_id=?";
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
@@ -58,64 +51,49 @@ public class FileDao {
 
             rs = ps.executeQuery();
             while(rs.next()){
-                AttachFile attachFile = new AttachFile(
-                        rs.getString("orig_name"),
-                        rs.getString("store_name"),
-                        rs.getString("ext"),
-                        rs.getString("store_dir")
-                );
+                AttachFile attachFile = AttachFile.builder()
+                        .origName(rs.getString("orig_name"))
+                        .storeName(rs.getString("store_name"))
+                        .ext(rs.getString("ext"))
+                        .storeDir(rs.getString("store_dir"))
+                        .build();
                 files.add(attachFile);
             }
             return files;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
     }
 
-    public static boolean[] isAttached(Integer[] idList){
-        String sql = "SELECT EXISTS(SELECT * FROM FILE WHERE post_id=? LIMIT 1)";
+    public static List<Integer> isAttached(List<String> idList){
+        String sql1 = "SELECT post_id FROM post p WHERE EXISTS (SELECT 1 FROM file f WHERE f.post_id IN (";
+        String sql2 = ") AND p.post_id = f.post_id)";
+        String inPostId = String.join(",", idList);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(sql1);
+        sb.append(inPostId);
+        sb.append(sql2);
 
         Connection con = DBConnector.getConnection();
-        PreparedStatement ps = null;
+        Statement st = null;
         ResultSet rs = null;
 
-        boolean[] isAttachedList = new boolean[idList.length];
+        List<Integer> attachedList = new ArrayList<>();
 
         try {
-            for(int i = 0; i < idList.length; i++){
-                ps = con.prepareStatement(sql);
-                ps.setInt(1, idList[i]);
-                rs = ps.executeQuery();
-                while (rs.next()){
-                    int result = rs.getInt(1);
-                    if(result==0){
-                        isAttachedList[i] = false;
-                    } else {
-                        isAttachedList[i] = true;
-                    }
-                }
-                ps.clearParameters();
-                rs.close();
+            st = con.createStatement();
+            rs = st.executeQuery(sb.toString());
+            while (rs.next()){
+                attachedList.add(rs.getInt(1));
             }
-            return isAttachedList;
+            return attachedList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, st, rs);
         }
     }
 

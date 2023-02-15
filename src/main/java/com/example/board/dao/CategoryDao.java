@@ -32,14 +32,7 @@ public class CategoryDao {
         } catch (SQLException e){
             e.printStackTrace();
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(st != null) st.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
-
+            DBConnector.close(con, st, rs);
         }
         return categories;
     }

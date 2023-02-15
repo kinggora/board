@@ -13,14 +13,16 @@
     String[] pathParts = pathInfo.split("/");
     String id = pathParts[1]; //{seq}
 
-    PostViewDto post = PostDao.findPostById(id, true);
-    pageContext.setAttribute("p", post);
+    PostDao.hitUp(id);
+
+    PostViewDto post = PostDao.findPostById(id);
+    pageContext.setAttribute("post", post);
 
     List<AttachFile> fileList = FileDao.findFile(id);
-    pageContext.setAttribute("fl", fileList);
+    pageContext.setAttribute("fileList", fileList);
 
     List<CommentDto> commentList = CommentDao.findComment(id);
-    pageContext.setAttribute("cl", commentList);
+    pageContext.setAttribute("commentList", commentList);
 %>
 
 <script type="text/javascript">
@@ -132,39 +134,39 @@
 <body>
 <div class="wrapper">
 <h1>게시판 - 보기</h1>
-<div style="float: left">${p.writer}</div>
-    <div style="float: right;">등록일시 ${p.regDate} &nbsp; &nbsp; &nbsp; &nbsp; 수정일시 ${p.modDate}</div><br><br>
+<div style="float: left">${post.writer}</div>
+    <div style="float: right;">등록일시 ${post.regDate} &nbsp; &nbsp; &nbsp; &nbsp; 수정일시 ${post.modDate}</div><br><br>
 
-<div style="float: left">[${p.category}] ${p.title}</div><div style="float: right">조회수: ${p.hit}</div><br><br>
+<div style="float: left">[${post.category}] ${post.title}</div><div style="float: right">조회수: ${post.hit}</div><br><br>
 <dv class="content">
-    <p>${p.content}</p>
+    <p>${post.content}</p>
 </dv>
 <dv>
-    <c:forEach var="f" items="${fl}">
-        <form method="post" id="${f.storeName}" action="/board/free/download.do">
-            <input type="hidden" name="storeName" value="${f.storeName}"/>
-            <input type="hidden" name="origName" value="${f.origName}"/>
-            <input type="hidden" name="storeDir" value="${f.storeDir}"/>
-            <input type="hidden" name="storeDir" value="${f.storeDir}"/>
+    <c:forEach var="file" items="${fileList}">
+        <form method="post" id="${file.storeName}" action="/board/free/download.do">
+            <input type="hidden" name="storeName" value="${file.storeName}"/>
+            <input type="hidden" name="origName" value="${file.origName}"/>
+            <input type="hidden" name="storeDir" value="${file.storeDir}"/>
+            <input type="hidden" name="storeDir" value="${file.storeDir}"/>
         </form>
-        <a href="" target=_blank onclick="document.getElementById('${f.storeName}').submit();">${f.origName}</a><br >
+        <a href="" target="_blank" onclick="document.getElementById('${file.storeName}').submit();">${file.origName}</a><br >
     </c:forEach>
     <br >
     <br >
 </dv>
 <dv>
     <table>
-        <c:forEach var="c" items="${cl}">
+        <c:forEach var="comment" items="${commentList}">
         <tr>
             <td>
-            ${c.regDate}<br>${c.content}<br>
+            ${comment.regDate}<br>${comment.content}<br>
             </td>
         </tr>
         </c:forEach>
         <tr>
             <td>
             <form name="commentForm" method="post" action="/board/free/commentOK" onsubmit="return false">
-                <input type="hidden" name="id" value="${p.postId}"/>
+                <input type="hidden" name="id" value="${post.postId}"/>
                 <div class="input_wrap">
                     <input class="input" type="text" name="comment" maxlength="499" placeholder="댓글을 입력해 주세요."/>
                     <button class="comment_submit_btn" onclick="createCmt()">등록</button>
@@ -176,7 +178,7 @@
 </dv>
 <dv>
     <form name="modifyForm" method="post">
-        <input type="hidden" name="id" value="${p.postId}"/>
+        <input type="hidden" name="id" value="${post.postId}"/>
     </form>
     <input type="button" value="목록" onclick="location.href='/boards/free/list'">
     <input type="button" value="수정" onclick="modifyPost()">
@@ -189,7 +191,7 @@
         <div class="popup_cont"><!--텍스트 영역-->
             <p class="text">
                 <form name="deleteForm" method="post" action="/board/free/deleteOK" onsubmit="return false">
-                    <input type="hidden" name="id" value="${p.postId}"/>
+                    <input type="hidden" name="id" value="${post.postId}"/>
                     비밀번호 <input type="password" name="password" placeholder="비밀번호를 입력해 주세요.">
                 </form>
             </p>

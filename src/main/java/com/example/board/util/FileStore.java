@@ -5,31 +5,36 @@ import com.example.board.model.AttachFile;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.net.URL;
+import java.util.*;
 
 public class FileStore {
-
-    private static String FILE_DIR = "C:/Users/HYUNA/IdeaProjects/board/build/libs/exploded/board-1.0-SNAPSHOT.war/upload";
 
     public static List<AttachFile> storeFiles(List<Part> parts) throws IOException {
         List<AttachFile> files = new ArrayList<>();
         for(Part part : parts){
-            InputStream is = part.getInputStream();
-            while(is.read() != -1){
-
-            }
             String origFileName = part.getSubmittedFileName();
             String extension = extracted(origFileName);
             String storeFileName = createStoreFileName(extension);
-            String storeDir = FILE_DIR + File.separator;
-            part.write(storeDir+storeFileName);
+            String storeDir = getStoragePath() + File.separator;
 
-            files.add(new AttachFile(origFileName, storeFileName, extension, storeDir));
+            part.write(storeDir + storeFileName);
+            AttachFile attachFile = AttachFile.builder()
+                    .origName(origFileName)
+                    .storeName(storeFileName)
+                    .ext(extension)
+                    .storeDir(storeDir)
+                    .build();
+            files.add(attachFile);
         }
         return files;
+    }
+
+    private static String getStoragePath() throws IOException {
+        URL resource = FileStore.class.getClassLoader().getResource("application.properties");
+        Properties properties = new Properties();
+        properties.load(resource.openStream());
+        return properties.getProperty("file.storage");
     }
 
     public static void deleteFiles(List<AttachFile> attachFiles){

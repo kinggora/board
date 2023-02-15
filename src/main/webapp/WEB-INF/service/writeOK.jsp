@@ -17,10 +17,15 @@
   String title = request.getParameter("title");
   String content = request.getParameter("content");
 
-
   if(PostValidator.createValidation(categoryId, writer, password, password2, title, content)){
     //POST insert
-    PostSaveDto dto = new PostSaveDto(Integer.parseInt(categoryId), writer, password, title, content);
+    PostSaveDto dto = PostSaveDto.builder()
+            .categoryId(Integer.parseInt(categoryId))
+            .writer(writer)
+            .password(password)
+            .title(title)
+            .content(content)
+            .build();
     int id = PostDao.savePost(dto);
 
     //FILE insert

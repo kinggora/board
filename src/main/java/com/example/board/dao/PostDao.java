@@ -1,19 +1,13 @@
 package com.example.board.dao;
 
 import com.example.board.DBConnector;
-import com.example.board.model.AttachFile;
-import com.example.board.model.PostSaveDto;
-import com.example.board.model.PostUpdateDto;
-import com.example.board.model.PostViewDto;
-import com.example.board.model.PageInfo;
-import com.example.board.model.PostSearch;
+import com.example.board.model.*;
 import com.example.board.util.FileStore;
 import com.example.board.util.PasswordEncryptor;
+import com.example.board.util.TimestampFormatter;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,70 +40,69 @@ public class PostDao {
             ps.setString(7, encrypt.get("hash"));
 
             ps.executeUpdate();
-            rs = ps.getGeneratedKeys();
+            rs = ps.getGeneratedKeys(); //Primary Key
             rs.next();
             return rs.getInt(1);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
     }
 
-    public static PostViewDto findPostById(String id, boolean hitUp){
+    public static PostViewDto findPostById(String id){
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
-        try {
-            if(hitUp){
-                String updateSql = "UPDATE POST SET hit=hit+1 WHERE post_id=?";
-                ps = con.prepareStatement(updateSql);
-                ps.setString(1, id);
-                ps.executeQuery();
-                ps.close();
-            }
 
-            String selectSql = "SELECT * FROM POST p JOIN CATEGORY c ON p.category_id=c.category_id WHERE p.post_id=?";
-            ps = con.prepareStatement(selectSql);
+        String sql = "SELECT * FROM post p JOIN category c ON p.category_id=c.category_id WHERE p.post_id=?";
+        try {
+            ps = con.prepareStatement(sql);
             ps.setString(1, id);
 
             rs = ps.executeQuery();
             rs.next();
 
-            PostViewDto dto = new PostViewDto(
-                    rs.getInt("p.post_id"),
-                    rs.getString("c.name"),
-                    rs.getString("p.writer"),
-                    rs.getString("p.title"),
-                    rs.getString("p.content"),
-                    timestampToString(rs.getTimestamp("p.reg_date")),
-                    timestampToString(rs.getTimestamp("p.mod_date")),
-                    rs.getInt("p.hit")
-            );
+            PostViewDto dto = PostViewDto.builder()
+                    .postId(rs.getInt("p.post_id"))
+                    .category(rs.getString("c.name"))
+                    .writer(rs.getString("p.writer"))
+                    .title(rs.getString("p.title"))
+                    .content(rs.getString("p.content"))
+                    .regDate(TimestampFormatter.timestampToString(rs.getTimestamp("p.reg_date")))
+                    .modDate(TimestampFormatter.timestampToString(rs.getTimestamp("p.mod_date")))
+                    .hit(rs.getInt("p.hit"))
+                    .build();
+
             return dto;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
+        }
+    }
+
+    public static void hitUp(String id){
+        Connection con = DBConnector.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        String sql = "UPDATE post SET hit=hit+1 WHERE post_id=?";
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setString(1, id);
+            ps.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnector.close(con, ps, rs);
         }
     }
 
     public static boolean updatePost(PostUpdateDto dto){
 
         String sql = "SELECT salt, hash " +
-                "FROM POST " +
+                "FROM post " +
                 "WHERE post_id=?";
 
         Connection con = DBConnector.getConnection();
@@ -127,7 +120,7 @@ public class PostDao {
                 return false;
             } else {
                 ps.close();
-                String updateSql = "UPDATE POST " +
+                String updateSql = "UPDATE post " +
                         "SET writer=?, title=?, content=?, mod_date=? " +
                         "WHERE post_id=?";
                 ps = con.prepareStatement(updateSql);
@@ -142,20 +135,14 @@ public class PostDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
     }
 
     public static boolean deletePost(String postId, String password){
 
         String sql = "SELECT salt, hash " +
-                "FROM POST " +
+                "FROM post " +
                 "WHERE post_id=?";
 
         Connection con = DBConnector.getConnection();
@@ -178,7 +165,7 @@ public class PostDao {
                 fileStore.deleteFiles(files);
 
                 //POST DELETE (FILE, COMMENT ON DELETE CASCADE)
-                String deleteSql = "DELETE FROM POST WHERE post_id=?";
+                String deleteSql = "DELETE FROM post WHERE post_id=?";
                 ps = con.prepareStatement(deleteSql);
                 ps.setInt(1, Integer.parseInt(postId));
                 ps.executeUpdate();
@@ -187,78 +174,113 @@ public class PostDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
     }
 
-    public static Map<String, Object> findPosts(PostSearch ps){
+    public static PostListDto findPosts(PostSearch ps){
         String searchSql = getSearchSql(ps);
-        String countSql = getCountSql(ps);
+        List<PostViewDto> postList = getPostList(searchSql);
 
+        String countSql = getCountSql(ps);
+        PageInfo pageInfo = getPageInfo(countSql);
+
+        return new PostListDto(postList, pageInfo);
+    }
+
+    private static List<PostViewDto> getPostList(String searchSql) {
         Connection con = DBConnector.getConnection();
         Statement st = null;
         ResultSet rs = null;
 
-        List<PostViewDto> posts = new ArrayList<>();
+        List<PostViewDto> postList = new ArrayList<>();
         try {
             st = con.createStatement();
             rs = st.executeQuery(searchSql);
 
-            while (rs.next()){
-                PostViewDto dto = new PostViewDto(
-                        rs.getInt("p.post_id"),
-                        rs.getString("c.name"),
-                        rs.getString("p.writer"),
-                        rs.getString("p.title"),
-                        rs.getString("p.content"),
-                        timestampToString(rs.getTimestamp("p.reg_date")),
-                        timestampToString(rs.getTimestamp("p.mod_date")),
-                        rs.getInt("p.hit")
-                );
-                dto.setAttached(rs.getString("f.post_id")!=null);
-                posts.add(dto);
+            while (rs.next()) {
+                PostViewDto dto = PostViewDto.builder()
+                        .postId(rs.getInt("p.post_id"))
+                        .category(rs.getString("c.name"))
+                        .writer(rs.getString("p.writer"))
+                        .title(rs.getString("p.title"))
+                        .content(rs.getString("p.content"))
+                        .regDate(TimestampFormatter.timestampToString(rs.getTimestamp("p.reg_date")))
+                        .modDate(TimestampFormatter.timestampToString(rs.getTimestamp("p.mod_date")))
+                        .hit(rs.getInt("p.hit"))
+                        .build();
+                postList.add(dto);
             }
+        } catch (SQLException ex) {
+            throw new RuntimeException(ex);
+        } finally {
+            DBConnector.close(con, st, rs);
+        }
 
-            st.close();
+        return postList;
+    }
+
+    private static PageInfo getPageInfo(String countSql) {
+        Connection con = DBConnector.getConnection();
+        Statement st = null;
+        ResultSet rs = null;
+
+        int totalCount = 0;
+        try{
             st = con.createStatement();
             rs = st.executeQuery(countSql);
 
-            int totalCount = 0;
             if(rs.next()){
                 totalCount = rs.getInt(1);
             }
-            int pageCount = totalCount / PAGE_SIZE + 1;
-            PageInfo pageInfo = new PageInfo(totalCount, pageCount);
-
-            Map<String, Object> result = new HashMap<>();
-            result.put("postList", posts);
-            result.put("pageInfo", pageInfo);
-
-            return result;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) st.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, st, rs);
         }
+
+        int pageCount = totalCount / PAGE_SIZE + 1;
+        return new PageInfo(totalCount, pageCount);
+    }
+
+    private static String getSearchSql(PostSearch ps){
+        int pageNumber = ps.getPageNumber();
+        String categoryId = ps.getCategoryId();
+        String searchWord = ps.getSearchWord();
+
+        int startRow = (pageNumber-1) * PAGE_SIZE;
+
+
+        String sql = "SELECT * FROM post p JOIN category c " +
+                "WHERE p.category_id=c.category_id";
+
+        StringBuilder sb = new StringBuilder(sql);
+
+        if(categoryId.length() > 0){
+            sb.append(" AND p.category_id=").append(categoryId);
+        }
+        //검색어가 공백문자나 빈 문자열이 아니고 2글자 이상
+        if(!searchWord.isBlank() && searchWord.length() >= 2){
+            sb.append(" AND (p.title LIKE '%")
+                    .append(searchWord)
+                    .append("%' OR p.writer LIKE '%")
+                    .append(searchWord)
+                    .append("%' OR p.content LIKE '%")
+                    .append(searchWord)
+                    .append("%')");
+        }
+
+        sb.append(" ORDER BY p.reg_date DESC");
+        sb.append(" LIMIT ").append(startRow).append(",").append(PAGE_SIZE);
+
+        return sb.toString();
     }
 
     private static String getCountSql(PostSearch ps) {
         String categoryId = ps.getCategoryId();
         String searchWord = ps.getSearchWord();
 
-        String sql = "SELECT COUNT(*) FROM POST";
+        String sql = "SELECT COUNT(*) FROM post";
 
         StringBuilder sb = new StringBuilder(sql);
 
@@ -283,75 +305,6 @@ public class PostDao {
                     .append("%'");
         }
         return sb.toString();
-    }
-
-    private static String getSearchSql(PostSearch ps){
-        int pageNumber = ps.getPageNumber();
-        String categoryId = ps.getCategoryId();
-        String searchWord = ps.getSearchWord();
-
-        int startRow = (pageNumber-1) * PAGE_SIZE;
-
-        boolean where = false;
-
-//        String sql = "SELECT * FROM POST p JOIN CATEGORY c " +
-//                "WHERE p.category_id=c.category_id";
-        String sql = "SELECT * FROM (SELECT post_id, category_id, writer, title, content, reg_date, mod_date, hit FROM POST) p " +
-                "LEFT JOIN (SELECT category_id, name FROM CATEGORY) c ON p.category_id=c.category_id " +
-                "LEFT JOIN (SELECT DISTINCT post_id FROM FILE) f ON f.post_id=p.post_id";
-
-        StringBuilder sb = new StringBuilder(sql);
-
-//        if(categoryId.length() > 0){
-//            sb.append(" AND p.category_id=").append(categoryId);
-//        }
-//        //검색어가 공백문자나 빈 문자열이 아니고 2글자 이상
-//        if(!searchWord.isBlank() && searchWord.length() >= 2){
-//            sb.append(" AND (p.title LIKE '%")
-//                    .append(searchWord)
-//                    .append("%' OR p.writer LIKE '%")
-//                    .append(searchWord)
-//                    .append("%' OR p.content LIKE '%")
-//                    .append(searchWord)
-//                    .append("%')");
-//        }
-        if(categoryId.length() > 0){
-            sb.append(" WHERE p.category_id=").append(categoryId);
-            where = true;
-        }
-        if(where){
-            if(!searchWord.isBlank() && searchWord.length() >= 2){
-                sb.append(" AND (p.title LIKE '%")
-                        .append(searchWord)
-                        .append("%' OR p.writer LIKE '%")
-                        .append(searchWord)
-                        .append("%' OR p.content LIKE '%")
-                        .append(searchWord)
-                        .append("%')");
-            }
-        } else {
-            if(!searchWord.isBlank() && searchWord.length() >= 2){
-                sb.append(" WHERE p.title LIKE '%")
-                        .append(searchWord)
-                        .append("%' OR p.writer LIKE '%")
-                        .append(searchWord)
-                        .append("%' OR p.content LIKE '%")
-                        .append(searchWord)
-                        .append("%'");
-            }
-        }
-        sb.append(" ORDER BY p.reg_date DESC");
-        sb.append(" LIMIT ").append(startRow).append(",").append(PAGE_SIZE);
-
-        return sb.toString();
-    }
-
-
-    private static String timestampToString(Timestamp timestamp){
-        if(timestamp == null){
-            return "-";
-        }
-        return new SimpleDateFormat("yyyy.MM.dd HH:mm").format(timestamp);
     }
 }
 

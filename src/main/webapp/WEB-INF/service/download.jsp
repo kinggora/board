@@ -7,8 +7,6 @@
     String storeDir = request.getParameter("storeDir");
     String origName = request.getParameter("origName");
 
-    System.out.println("origName = " + origName);
-
     File file = new File(storeDir, storeName);
     FileInputStream fis = new FileInputStream(file);
     origName = new String(origName.getBytes("utf-8"), "8859_1");

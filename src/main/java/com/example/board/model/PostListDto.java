@@ -3,11 +3,13 @@ package com.example.board.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 @AllArgsConstructor
-public class CommentDto {
+public class PostListDto {
 
-    private String regDate;
-    private String content;
+    private List<PostViewDto> postList;
+    private PageInfo pageInfo;
 
 }

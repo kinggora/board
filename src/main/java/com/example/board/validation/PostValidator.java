@@ -15,11 +15,6 @@ public class PostValidator {
             return false;
         }
 
-        String regex = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{4,16}$";
-        Pattern pattern = Pattern.compile(regex);
-        if(!pattern.matcher(password).matches()){
-            return false;
-        }
         return true;
     }
 
@@ -30,6 +25,12 @@ public class PostValidator {
         }
 
         if(!isInteger(id)){
+            return false;
+        }
+
+        String regex = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{4,16}$";
+        Pattern pattern = Pattern.compile(regex);
+        if(!pattern.matcher(password).matches()){
             return false;
         }
 

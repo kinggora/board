@@ -2,9 +2,9 @@ package com.example.board.dao;
 
 import com.example.board.DBConnector;
 import com.example.board.model.CommentDto;
+import com.example.board.util.TimestampFormatter;
 
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,13 +32,7 @@ public class CommentDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
     }
 
@@ -58,7 +52,7 @@ public class CommentDao {
             rs = ps.executeQuery();
 
             while (rs.next()){
-                String regDate = timestampToString(rs.getTimestamp("reg_date"));
+                String regDate = TimestampFormatter.timestampToString(rs.getTimestamp("reg_date"));
                 String content = rs.getString("content");
                 CommentDto comment = new CommentDto(regDate, content);
                 comments.add(comment);
@@ -66,21 +60,9 @@ public class CommentDao {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
-            try{
-                if(rs != null) rs.close();
-                if(ps != null) ps.close();
-                if(con != null) con.close();
-            } catch (SQLException e){
-                e.printStackTrace();
-            }
+            DBConnector.close(con, ps, rs);
         }
         return comments;
     }
 
-    private static String timestampToString(Timestamp timestamp){
-        if(timestamp == null){
-            return "-";
-        }
-        return new SimpleDateFormat("yyyy.MM.dd HH:mm").format(timestamp);
-    }
 }
