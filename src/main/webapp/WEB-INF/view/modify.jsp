@@ -18,7 +18,7 @@
 
   pageContext.setAttribute("post", post);
 
-  List<AttachFile> fileList = FileDao.findFile(postId);
+  List<AttachFile> fileList = FileDao.findFiles(postId);
   pageContext.setAttribute("fileList", fileList);
 %>
 <script type="text/javascript">

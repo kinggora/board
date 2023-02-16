@@ -13,7 +13,7 @@ public class CategoryDao {
     }
 
     public static List<Category> getCategories(){
-        String sql = "SELECT * FROM CATEGORY";
+        String sql = "SELECT * FROM category";
 
         Connection con = DBConnector.getConnection();
         Statement st = null;

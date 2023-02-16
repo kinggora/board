@@ -18,7 +18,7 @@
     PostViewDto post = PostDao.findPostById(id);
     pageContext.setAttribute("post", post);
 
-    List<AttachFile> fileList = FileDao.findFile(id);
+    List<AttachFile> fileList = FileDao.findFiles(id);
     pageContext.setAttribute("fileList", fileList);
 
     List<CommentDto> commentList = CommentDao.findComment(id);
@@ -143,13 +143,10 @@
 </dv>
 <dv>
     <c:forEach var="file" items="${fileList}">
-        <form method="post" id="${file.storeName}" action="/board/free/download.do">
-            <input type="hidden" name="storeName" value="${file.storeName}"/>
-            <input type="hidden" name="origName" value="${file.origName}"/>
-            <input type="hidden" name="storeDir" value="${file.storeDir}"/>
-            <input type="hidden" name="storeDir" value="${file.storeDir}"/>
+        <form method="post" action="/board/free/download.do">
+            <input type="hidden" name="fileId" value="${file.fileId}"/>
+            <input type="submit" value="${file.origName}" target="_blank"/><br >
         </form>
-        <a href="" target="_blank" onclick="document.getElementById('${file.storeName}').submit();">${file.origName}</a><br >
     </c:forEach>
     <br >
     <br >

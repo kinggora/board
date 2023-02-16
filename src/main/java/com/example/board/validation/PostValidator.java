@@ -1,29 +1,40 @@
 package com.example.board.validation;
 
+import lombok.Builder;
+
 import java.util.regex.Pattern;
 
-
+@Builder
 public class PostValidator {
 
-    public static boolean createValidation(String id, String writer, String password, String password2, String title, String content){
+    private String id;
+    private String writer;
+    private String password;
+    private String password2;
+    private String title;
+    private String content;
+
+    public boolean createValidation(){
 
         if(!password.equals(password2)){
             return false;
         }
 
-        if(!modifyValidation(id, writer, password, title, content)){
+        if(!modifyValidation()){
             return false;
         }
 
         return true;
     }
 
-    public static boolean modifyValidation(String id, String writer, String password, String title, String content){
+    public boolean modifyValidation(){
 
-        if(id == null || writer == null || password == null || title == null || content == null){
+        //null 또는 빈 문자열 또는 공백문자
+        if(id.isBlank() || writer.isBlank() || password.isBlank() || title.isBlank() || content.isBlank()){
             return false;
         }
 
+        //int 타입으로 변환 불가
         if(!isInteger(id)){
             return false;
         }
@@ -31,6 +42,11 @@ public class PostValidator {
         String regex = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{4,16}$";
         Pattern pattern = Pattern.compile(regex);
         if(!pattern.matcher(password).matches()){
+            return false;
+        }
+
+        //공백문자 포함
+        if(writer.contains(" ")){
             return false;
         }
 

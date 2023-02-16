@@ -2,15 +2,15 @@ package com.example.board.util;
 
 import com.example.board.model.AttachFile;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.util.*;
 
 public class FileStore {
 
-    public static List<AttachFile> storeFiles(List<Part> parts) throws IOException {
+    public static List<AttachFile> uploadFiles(List<Part> parts) throws IOException {
         List<AttachFile> files = new ArrayList<>();
         for(Part part : parts){
             String origFileName = part.getSubmittedFileName();
@@ -19,6 +19,7 @@ public class FileStore {
             String storeDir = getStoragePath() + File.separator;
 
             part.write(storeDir + storeFileName);
+
             AttachFile attachFile = AttachFile.builder()
                     .origName(origFileName)
                     .storeName(storeFileName)
@@ -28,6 +29,47 @@ public class FileStore {
             files.add(attachFile);
         }
         return files;
+    }
+
+    public static void downloadFile(AttachFile attachFile, HttpServletResponse response){
+        File file = new File(attachFile.getStoreDir(), attachFile.getStoreName());
+
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        String origName = attachFile.getOrigName();
+        try {
+            origName = new String(origName.getBytes("utf-8"), "8859_1");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        response.setContentType("application/octet-stream");
+        response.setHeader("Cache-Control", "no-cache");
+        response.addHeader("Content-disposition", "attachment; fileName=" + origName);
+
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+            byte[] buffer = new byte[1024 * 8];
+            while(true){
+                int count = fis.read(buffer);
+                if(count == -1){
+                    break;
+                }
+                os.write(buffer, 0, count);
+            }
+            os.flush();
+
+            os.close();
+            fis.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static String getStoragePath() throws IOException {
@@ -54,5 +96,4 @@ public class FileStore {
         int pos = OrigFileName.lastIndexOf(".");
         return OrigFileName.substring(pos+1);
     }
-
 }

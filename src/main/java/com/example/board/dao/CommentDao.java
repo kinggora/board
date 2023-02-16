@@ -38,7 +38,7 @@ public class CommentDao {
 
     public static List<CommentDto> findComment(String postId){
         String sql =
-                "SELECT * FROM COMMENT WHERE post_id=?";
+                "SELECT * FROM comment WHERE post_id=?";
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;

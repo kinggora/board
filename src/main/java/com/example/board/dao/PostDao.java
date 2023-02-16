@@ -3,13 +3,11 @@ package com.example.board.dao;
 import com.example.board.DBConnector;
 import com.example.board.model.*;
 import com.example.board.util.FileStore;
-import com.example.board.util.PasswordEncryptor;
 import com.example.board.util.TimestampFormatter;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class PostDao {
 
@@ -18,12 +16,8 @@ public class PostDao {
     private PostDao() {}
 
     public static int savePost(PostSaveDto dto){
-
-        PasswordEncryptor encryptor = new PasswordEncryptor();
-        Map<String, String> encrypt = encryptor.encrypt(dto.getPassword());
-
-        String sql = "INSERT INTO POST(post_id, category_id, writer, title, content, reg_date, salt, hash) " +
-                "VALUES(NULL, ?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO POST(post_id, category_id, writer, password, title, content, reg_date) " +
+                "VALUES(NULL, ?,?,SHA2(?,256),?,?,?)";
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
@@ -33,11 +27,10 @@ public class PostDao {
 
             ps.setInt(1, dto.getCategoryId());
             ps.setString(2, dto.getWriter());
-            ps.setString(3, dto.getTitle());
-            ps.setString(4, dto.getContent());
-            ps.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
-            ps.setString(6, encrypt.get("salt"));
-            ps.setString(7, encrypt.get("hash"));
+            ps.setString(3, dto.getPassword());
+            ps.setString(4, dto.getTitle());
+            ps.setString(5, dto.getContent());
+            ps.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
 
             ps.executeUpdate();
             rs = ps.getGeneratedKeys(); //Primary Key
@@ -100,82 +93,58 @@ public class PostDao {
     }
 
     public static boolean updatePost(PostUpdateDto dto){
-
-        String sql = "SELECT salt, hash " +
-                "FROM post " +
-                "WHERE post_id=?";
+        if(!checkPassword(dto.getPostId(), dto.getPassword())){
+            return false;
+        }
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
+            String sql = "UPDATE post " +
+                    "SET writer=?, title=?, content=?, mod_date=? " +
+                    "WHERE post_id=?";
             ps = con.prepareStatement(sql);
-            ps.setString(1, dto.getPostId());
-
-            rs = ps.executeQuery();
-            rs.next();
-
-            PasswordEncryptor encryptor = new PasswordEncryptor();
-            if(!encryptor.check(dto.getPassword(), rs.getString("salt"), rs.getString("hash"))){
-                return false;
-            } else {
-                ps.close();
-                String updateSql = "UPDATE post " +
-                        "SET writer=?, title=?, content=?, mod_date=? " +
-                        "WHERE post_id=?";
-                ps = con.prepareStatement(updateSql);
-                ps.setString(1, dto.getWriter());
-                ps.setString(2, dto.getTitle());
-                ps.setString(3, dto.getContent());
-                ps.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
-                ps.setString(5, dto.getPostId());
-                ps.executeUpdate();
-                return true;
-            }
+            ps.setString(1, dto.getWriter());
+            ps.setString(2, dto.getTitle());
+            ps.setString(3, dto.getContent());
+            ps.setTimestamp(4, new Timestamp(System.currentTimeMillis()));
+            ps.setString(5, dto.getPostId());
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             DBConnector.close(con, ps, rs);
         }
+        return true;
     }
 
     public static boolean deletePost(String postId, String password){
-
-        String sql = "SELECT salt, hash " +
-                "FROM post " +
-                "WHERE post_id=?";
+        if(!checkPassword(postId, password)){
+            return false;
+        }
 
         Connection con = DBConnector.getConnection();
         PreparedStatement ps = null;
         ResultSet rs = null;
+
         try {
-            ps = con.prepareStatement(sql);
+            //Storage 의 FILE 삭제
+            List<AttachFile> files = FileDao.findFiles(postId);
+            FileStore fileStore = new FileStore();
+            fileStore.deleteFiles(files);
+
+            //POST DELETE (FILE, COMMENT ON DELETE CASCADE)
+            String deleteSql = "DELETE FROM post WHERE post_id=?";
+            ps = con.prepareStatement(deleteSql);
             ps.setInt(1, Integer.parseInt(postId));
-
-            rs = ps.executeQuery();
-            rs.next();
-
-            PasswordEncryptor encryptor = new PasswordEncryptor();
-            if(!encryptor.check(password, rs.getString("salt"), rs.getString("hash"))){
-                return false;
-            } else {
-                //Storage 의 FILE 삭제
-                List<AttachFile> files = FileDao.findFile(postId);
-                FileStore fileStore = new FileStore();
-                fileStore.deleteFiles(files);
-
-                //POST DELETE (FILE, COMMENT ON DELETE CASCADE)
-                String deleteSql = "DELETE FROM post WHERE post_id=?";
-                ps = con.prepareStatement(deleteSql);
-                ps.setInt(1, Integer.parseInt(postId));
-                ps.executeUpdate();
-                return true;
-            }
+            ps.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             DBConnector.close(con, ps, rs);
         }
+        return true;
     }
 
     public static PostListDto findPosts(PostSearch ps){
@@ -305,6 +274,31 @@ public class PostDao {
                     .append("%'");
         }
         return sb.toString();
+    }
+
+    private static boolean checkPassword(String postId, String password) {
+        String sql = "SELECT COUNT(post_id) AS CNT FROM post WHERE post_id=? AND password=SHA2(?, 256)";
+        Connection con = DBConnector.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        int cnt = 0;
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setString(1, postId);
+            ps.setString(2, password);
+
+            rs = ps.executeQuery();
+
+            if(rs.next()){
+                cnt = rs.getInt("CNT");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnector.close(con, ps, rs);
+        }
+        return cnt == 1;
     }
 }
 

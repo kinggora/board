@@ -17,7 +17,16 @@
   String title = request.getParameter("title");
   String content = request.getParameter("content");
 
-  if(PostValidator.createValidation(categoryId, writer, password, password2, title, content)){
+  PostValidator validator = PostValidator.builder()
+          .id(categoryId)
+          .writer(writer)
+          .password(password)
+          .password2(password2)
+          .title(title)
+          .content(content)
+          .build();
+
+  if(validator.createValidation()){
     //POST insert
     PostSaveDto dto = PostSaveDto.builder()
             .categoryId(Integer.parseInt(categoryId))
@@ -37,7 +46,7 @@
     }
     if(!parts.isEmpty()){
       //파일 저장 (storage)
-      List<AttachFile> attachFiles = FileStore.storeFiles(parts);
+      List<AttachFile> attachFiles = FileStore.uploadFiles(parts);
       //파일 정보 저장 (database)
       FileDao.saveFile(id, attachFiles);
     }

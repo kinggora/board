@@ -37,7 +37,37 @@ public class FileDao {
         }
     }
 
-    public static List<AttachFile> findFile(String id){
+    public static AttachFile findFileById(String id){
+        String sql = "SELECT * FROM file WHERE file_id=? LIMIT 1";
+
+        Connection con = DBConnector.getConnection();
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        AttachFile attachFile = null;
+        try {
+            ps = con.prepareStatement(sql);
+            ps.setString(1, id);
+
+            rs = ps.executeQuery();
+            if(rs.next()){
+                attachFile = AttachFile.builder()
+                        .postId(rs.getInt("post_id"))
+                        .origName(rs.getString("orig_name"))
+                        .storeName(rs.getString("store_name"))
+                        .ext(rs.getString("ext"))
+                        .storeDir(rs.getString("store_dir"))
+                        .build();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            DBConnector.close(con, ps, rs);
+        }
+        return attachFile;
+    }
+
+    public static List<AttachFile> findFiles(String id){
         String sql = "SELECT * FROM file WHERE post_id=?";
 
         Connection con = DBConnector.getConnection();
@@ -52,6 +82,7 @@ public class FileDao {
             rs = ps.executeQuery();
             while(rs.next()){
                 AttachFile attachFile = AttachFile.builder()
+                        .fileId(rs.getInt("file_id"))
                         .origName(rs.getString("orig_name"))
                         .storeName(rs.getString("store_name"))
                         .ext(rs.getString("ext"))
@@ -59,15 +90,21 @@ public class FileDao {
                         .build();
                 files.add(attachFile);
             }
-            return files;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             DBConnector.close(con, ps, rs);
         }
+        return files;
     }
 
     public static List<Integer> isAttached(List<String> idList){
+        List<Integer> attachedList = new ArrayList<>();
+
+        if(idList.isEmpty()) {
+            return attachedList;
+        }
+
         String sql1 = "SELECT post_id FROM post p WHERE EXISTS (SELECT 1 FROM file f WHERE f.post_id IN (";
         String sql2 = ") AND p.post_id = f.post_id)";
         String inPostId = String.join(",", idList);
@@ -81,20 +118,18 @@ public class FileDao {
         Statement st = null;
         ResultSet rs = null;
 
-        List<Integer> attachedList = new ArrayList<>();
-
         try {
             st = con.createStatement();
             rs = st.executeQuery(sb.toString());
             while (rs.next()){
                 attachedList.add(rs.getInt(1));
             }
-            return attachedList;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } finally {
             DBConnector.close(con, st, rs);
         }
+        return attachedList;
     }
 
 }

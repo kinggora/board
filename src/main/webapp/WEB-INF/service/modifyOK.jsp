@@ -15,8 +15,16 @@
     String title = request.getParameter("title");
     String content = request.getParameter("content");
 
+    PostValidator validator = PostValidator.builder()
+            .id(postId)
+            .writer(writer)
+            .password(password)
+            .title(title)
+            .content(content)
+            .build();
+
     //Validation
-    if(PostValidator.modifyValidation(postId, writer, password, title, content)){
+    if(validator.modifyValidation()){
         //POST update
         PostUpdateDto dto = PostUpdateDto
                 .builder()
@@ -40,7 +48,7 @@
 
             if(!parts.isEmpty()){
                 //파일 저장 (storage)
-                List<AttachFile> attachFiles = FileStore.storeFiles(parts);
+                List<AttachFile> attachFiles = FileStore.uploadFiles(parts);
                 //파일 정보 저장 (database)
                 FileDao.saveFile(Integer.parseInt(postId), attachFiles);
             }
