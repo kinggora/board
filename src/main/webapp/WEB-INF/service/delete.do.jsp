@@ -2,8 +2,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    String id = request.getParameter("id");
-    String password = request.getParameter("password");
+    String id = (String)request.getAttribute("id");
+    String password = (String)request.getAttribute("password");
 
     //삭제 성공 -> 게시판 목록 이동
     boolean deleteResult = PostDao.deletePost(id, password);

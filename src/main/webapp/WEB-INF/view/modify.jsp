@@ -7,7 +7,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
 <%
-  String postId = request.getParameter("id");
+  String postId = (String)request.getAttribute("id");
   PostViewDto post = PostDao.findPostById(postId);
 
   //수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
@@ -102,7 +102,7 @@
 <body>
 <h1>게시판 - 수정</h1>
 <div>
-  <form name="modify" method="post" action="/board/free/modifyOK" enctype="multipart/form-data" onsubmit="return false;">
+  <form name="modify" method="post" action="/board/free/modify.do" enctype="multipart/form-data" onsubmit="return false;">
     <table>
       <input type="hidden" name="id" value='${post.postId}'/>
       <tr>

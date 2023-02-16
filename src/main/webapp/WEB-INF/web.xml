@@ -4,89 +4,86 @@
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
          version="5.0">
 
-    <servlet>
-        <servlet-name>write</servlet-name>
-        <jsp-file>/WEB-INF/view/write.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>write</servlet-name>
-        <url-pattern>/board/free/write</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>write</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/view/write.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>write</servlet-name>-->
+<!--        <url-pattern>/board/free/write</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>view</servlet-name>
-        <jsp-file>/WEB-INF/view/view.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>view</servlet-name>
-        <url-pattern>/boards/free/view/*</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>view</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/view/view.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>view</servlet-name>-->
+<!--        <url-pattern>/boards/free/view/*</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>writeOK</servlet-name>
-        <jsp-file>/WEB-INF/service/writeOK.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>writeOK</servlet-name>
-        <url-pattern>/board/free/writeOK</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>writeOK</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/service/write.do.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>writeOK</servlet-name>-->
+<!--        <url-pattern>/board/free/writeOK</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>commentOK</servlet-name>
-        <jsp-file>/WEB-INF/service/commentOK.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>commentOK</servlet-name>
-        <url-pattern>/board/free/commentOK</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>commentOK</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/service/comment.do.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>commentOK</servlet-name>-->
+<!--        <url-pattern>/board/free/commentOK</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>modify</servlet-name>
-        <jsp-file>/WEB-INF/view/modify.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>modify</servlet-name>
-        <url-pattern>/board/free/modify</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>modify</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/view/modify.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>modify</servlet-name>-->
+<!--        <url-pattern>/board/free/modify</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>modifyOK</servlet-name>
-        <jsp-file>/WEB-INF/service/modifyOK.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>modifyOK</servlet-name>
-        <url-pattern>/board/free/modifyOK</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>modifyOK</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/service/modify.do.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>modifyOK</servlet-name>-->
+<!--        <url-pattern>/board/free/modifyOK</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>deleteOK</servlet-name>
-        <jsp-file>/WEB-INF/service/deleteOK.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>deleteOK</servlet-name>
-        <url-pattern>/board/free/deleteOK</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>deleteOK</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/service/delete.do.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>deleteOK</servlet-name>-->
+<!--        <url-pattern>/board/free/deleteOK</url-pattern>-->
+<!--    </servlet-mapping>-->
 
+<!--    <servlet>-->
+<!--        <servlet-name>list</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/view/list.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>list</servlet-name>-->
+<!--        <url-pattern>/boards/free/list</url-pattern>-->
+<!--    </servlet-mapping>-->
 
-    <servlet>
-        <servlet-name>list</servlet-name>
-        <jsp-file>/WEB-INF/view/list.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>list</servlet-name>
-        <url-pattern>/boards/free/list</url-pattern>
-    </servlet-mapping>
-
-
-
-    <servlet>
-        <servlet-name>download</servlet-name>
-        <jsp-file>/WEB-INF/service/download.jsp</jsp-file>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>download</servlet-name>
-        <url-pattern>/board/free/download.do</url-pattern>
-    </servlet-mapping>
+<!--    <servlet>-->
+<!--        <servlet-name>download</servlet-name>-->
+<!--        <jsp-file>/WEB-INF/service/download.do.jsp</jsp-file>-->
+<!--    </servlet>-->
+<!--    <servlet-mapping>-->
+<!--        <servlet-name>download</servlet-name>-->
+<!--        <url-pattern>/board/free/download.do</url-pattern>-->
+<!--    </servlet-mapping>-->
 </web-app>
 
 

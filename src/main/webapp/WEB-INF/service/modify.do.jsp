@@ -9,11 +9,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    String postId = request.getParameter("id");
-    String writer = request.getParameter("writer");
-    String password = request.getParameter("password");
-    String title = request.getParameter("title");
-    String content = request.getParameter("content");
+    String postId = (String)request.getAttribute("id");
+    String writer = (String)request.getAttribute("writer");
+    String password = (String)request.getAttribute("password");
+    String title = (String)request.getAttribute("title");
+    String content = (String)request.getAttribute("content");
 
     PostValidator validator = PostValidator.builder()
             .id(postId)

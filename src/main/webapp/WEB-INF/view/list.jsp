@@ -8,16 +8,16 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%
-  String currentPage = request.getParameter("page");
-  String searchCategory = request.getParameter("category");
-  String searchWord = request.getParameter("search_word");
+    String currentPage = (String)request.getAttribute("page");
+    String searchCategory = (String)request.getAttribute("category");
+    String searchWord = (String)request.getAttribute("search_word");
 
-  PostSearch postSearch = PostSearch
-          .builder()
-          .pageNumber(currentPage)
-          .categoryId(searchCategory)
-          .searchWord(searchWord)
-          .build();
+    PostSearch postSearch = PostSearch
+            .builder()
+            .pageNumber(currentPage)
+            .categoryId(searchCategory)
+            .searchWord(searchWord)
+            .build();
 
   PostListDto postListDto = PostDao.findPosts(postSearch);
   List<PostViewDto> postList = postListDto.getPostList();

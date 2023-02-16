@@ -10,12 +10,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-  String categoryId = request.getParameter("category");
-  String writer = request.getParameter("writer");
-  String password = request.getParameter("password");
-  String password2 = request.getParameter("password2");
-  String title = request.getParameter("title");
-  String content = request.getParameter("content");
+  String categoryId = (String)request.getAttribute("category");
+  String writer = (String)request.getAttribute("writer");
+  String password = (String)request.getAttribute("password");
+  String password2 = (String)request.getAttribute("password2");
+  String title = (String)request.getAttribute("title");
+  String content = (String)request.getAttribute("content");
 
   PostValidator validator = PostValidator.builder()
           .id(categoryId)

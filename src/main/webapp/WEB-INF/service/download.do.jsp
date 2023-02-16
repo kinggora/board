@@ -3,7 +3,7 @@
 <%@ page import="com.example.board.util.FileStore" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-    String id = request.getParameter("fileId");
+    String id = (String)request.getAttribute("fileId");
 
     AttachFile findFile = FileDao.findFileById(id);
 

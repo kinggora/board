@@ -82,7 +82,7 @@
 <body>
 <h1>게시판 - 등록</h1>
 <div>
-<form name="write" method="post" action="/board/free/writeOK" enctype="multipart/form-data">
+<form name="write" method="post" action="/board/free/write.do" enctype="multipart/form-data">
     <table>
         <tr>
             <td>카테고리</td>

@@ -9,9 +9,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    String pathInfo = request.getPathInfo();
-    String[] pathParts = pathInfo.split("/");
-    String id = pathParts[1]; //{seq}
+    String id = (String)request.getAttribute("id");
 
     PostDao.hitUp(id);
 
@@ -162,7 +160,7 @@
         </c:forEach>
         <tr>
             <td>
-            <form name="commentForm" method="post" action="/board/free/commentOK" onsubmit="return false">
+            <form name="commentForm" method="post" action="/board/free/comment.do" onsubmit="return false">
                 <input type="hidden" name="id" value="${post.postId}"/>
                 <div class="input_wrap">
                     <input class="input" type="text" name="comment" maxlength="499" placeholder="댓글을 입력해 주세요."/>
@@ -187,7 +185,7 @@
     <div class="popup_box"> <!--팝업창-->
         <div class="popup_cont"><!--텍스트 영역-->
             <p class="text">
-                <form name="deleteForm" method="post" action="/board/free/deleteOK" onsubmit="return false">
+                <form name="deleteForm" method="post" action="/board/free/delete.do" onsubmit="return false">
                     <input type="hidden" name="id" value="${post.postId}"/>
                     비밀번호 <input type="password" name="password" placeholder="비밀번호를 입력해 주세요.">
                 </form>
