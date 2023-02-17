@@ -1,4 +1,4 @@
-package com.example.board.validation;
+package com.example.board.web.validation;
 
 import lombok.Builder;
 

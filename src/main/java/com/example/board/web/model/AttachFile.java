@@ -1,10 +1,11 @@
-package com.example.board.model;
+package com.example.board.web.model;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AttachFile {
     private int fileId;
     private int postId;

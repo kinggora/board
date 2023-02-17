@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.board.mapper.PostMapper">
+    <insert id="savePost" parameterType="com.example.board.web.model.PostSaveDto" useGeneratedKeys="true" keyProperty="postId">
+        INSERT INTO post(
+        category_id
+        , writer
+        , password
+        , title
+        , content
+        , reg_date
+        )
+        VALUES(
+        #{categoryId}
+        , #{writer}
+        , SHA2(#{password},256)
+        , #{title}
+        , #{content}
+        , #{regDate}
+        )
+    </insert>
+
+    <select id="findPostById" parameterType="int" resultType="com.example.board.web.model.PostViewDto">
+        SELECT
+            p.post_id AS postId
+            , c.name AS category
+            , p.writer AS writer
+            , p.title AS title
+            , p.content AS content
+            , p.reg_date AS regDate
+            , p.mod_date AS modDate
+            , p.hit AS hit
+        FROM post p
+        JOIN category c
+        ON p.category_id=c.category_id
+        WHERE p.post_id=#{id}
+    </select>
+
+    <update id="hitUp" parameterType="int">
+        UPDATE post SET hit=hit+1 WHERE post_id=#{id}
+    </update>
+
+    <update id="updatePost" parameterType="com.example.board.web.model.PostUpdateDto">
+        UPDATE post
+        SET writer=#{writer}, title=#{title}, content=#{content}, mod_date=#{modDate}
+        WHERE post_id=#{postId}
+    </update>
+
+    <select id="checkPassword" parameterType="map" resultType="int">
+        SELECT COUNT(post_id)
+        FROM post
+        WHERE post_id=#{id}
+            AND password=SHA2(#{password}, 256)
+    </select>
+
+    <delete id="deletePost" parameterType="int">
+        DELETE FROM post WHERE post_id=#{id}
+    </delete>
+
+<!-- TODO 검색 쿼리 -->
+    <select id="getPostList" parameterType="com.example.board.web.model.PostSearch" resultType="com.example.board.web.model.PostViewDto">
+        SELECT * FROM post p
+        JOIN category c
+        WHERE p.category_id=c.category_id
+        <if test="#{categoryId} != ''">
+            AND p.category_id=#{categoryId}
+        </if>
+    </select>
+</mapper>

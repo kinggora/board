@@ -33,7 +33,7 @@
 
 <!--    <servlet>-->
 <!--        <servlet-name>commentOK</servlet-name>-->
-<!--        <jsp-file>/WEB-INF/service/comment.do.jsp</jsp-file>-->
+<!--        <jsp-file>/WEB-INF/service/commentDto.do.jsp</jsp-file>-->
 <!--    </servlet>-->
 <!--    <servlet-mapping>-->
 <!--        <servlet-name>commentOK</servlet-name>-->

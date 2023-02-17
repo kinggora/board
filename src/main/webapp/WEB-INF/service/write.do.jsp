@@ -1,11 +1,12 @@
-<%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.model.PostSaveDto" %>
-<%@ page import="com.example.board.util.FileStore" %>
+<%@ page import="com.example.board.web.service.PostDao" %>
+<%@ page import="com.example.board.web.model.PostSaveDto" %>
+<%@ page import="com.example.board.web.util.FileStore" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="com.example.board.model.AttachFile" %>
-<%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="com.example.board.validation.PostValidator" %>
+<%@ page import="com.example.board.web.model.AttachFile" %>
+<%@ page import="com.example.board.web.service.FileDao" %>
+<%@ page import="com.example.board.web.validation.PostValidator" %>
+<%@ page import="java.sql.Timestamp" %>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
@@ -46,9 +47,9 @@
     }
     if(!parts.isEmpty()){
       //파일 저장 (storage)
-      List<AttachFile> attachFiles = FileStore.uploadFiles(parts);
+      List<AttachFile> attachFiles = FileStore.uploadFiles(id, parts);
       //파일 정보 저장 (database)
-      FileDao.saveFile(id, attachFiles);
+      FileDao.saveFile(attachFiles);
     }
     response.sendRedirect("/boards/free/view/" + id);
   }

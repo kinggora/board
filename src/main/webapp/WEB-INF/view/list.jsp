@@ -1,9 +1,10 @@
-<%@ page import="com.example.board.dao.PostDao" %>
+<%@ page import="com.example.board.web.service.PostDao" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.example.board.dao.CategoryDao" %>
-<%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="java.util.stream.Collectors" %>
-<%@ page import="com.example.board.model.*" %>
+<%@ page import="com.example.board.web.service.FileDao" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="com.example.board.web.model.*" %>
+<%@ page import="com.example.board.DBConnector" %>
+<%@ page import="com.example.board.web.service.CategoryDto" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -26,9 +27,11 @@
   PageInfo pageInfo = postListDto.getPageInfo();
   pageContext.setAttribute("pageInfo", pageInfo);
 
-  List<String> idList = postList.stream()
-          .map(post -> String.valueOf(post.getPostId()))
-          .collect(Collectors.toList());
+  List<Integer> idList = new ArrayList<>();
+  for(PostViewDto post : postList) {
+      idList.add(post.getPostId());
+  }
+
   List<Integer> attachedList = FileDao.isAttached(idList);
   pageContext.setAttribute("attachedList", attachedList);
 
@@ -36,7 +39,7 @@
   pageContext.setAttribute("category", postSearch.getCategoryId());
   pageContext.setAttribute("searchWord", postSearch.getSearchWord());
 
-  List<Category> categories = CategoryDao.getCategories();
+  List<Category> categories = CategoryDto.getCategories();
   pageContext.setAttribute("categories", categories);
 
 %>

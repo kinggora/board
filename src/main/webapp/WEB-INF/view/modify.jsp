@@ -1,19 +1,24 @@
-<%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.model.PostViewDto" %>
-<%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="com.example.board.model.AttachFile" %>
+<%@ page import="com.example.board.web.service.PostDao" %>
+<%@ page import="com.example.board.web.model.PostViewDto" %>
+<%@ page import="com.example.board.web.service.FileDao" %>
+<%@ page import="com.example.board.web.model.AttachFile" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.example.board.web.util.TypeConvertor" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
 <%
-  String postId = (String)request.getAttribute("id");
+  String id = (String)request.getAttribute("id");
+  int postId = TypeConvertor.stringToInt(id);
+
   PostViewDto post = PostDao.findPostById(postId);
 
   //수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
   String writer = request.getParameter("writer");
   String title = request.getParameter("title");
   String content = request.getParameter("content");
+
+  //TODO 수정 데이터 검증
   post.modifyDto(writer, title, content);
 
   pageContext.setAttribute("post", post);

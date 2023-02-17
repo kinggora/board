@@ -1,25 +1,27 @@
-<%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.model.PostViewDto" %>
-<%@ page import="com.example.board.dao.CommentDao" %>
-<%@ page import="com.example.board.model.CommentDto" %>
+<%@ page import="com.example.board.web.service.PostDao" %>
+<%@ page import="com.example.board.web.model.PostViewDto" %>
+<%@ page import="com.example.board.web.service.CommentDao" %>
+<%@ page import="com.example.board.web.model.CommentDto" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="com.example.board.model.AttachFile" %>
+<%@ page import="com.example.board.web.service.FileDao" %>
+<%@ page import="com.example.board.web.model.AttachFile" %>
+<%@ page import="com.example.board.web.util.TypeConvertor" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    String id = (String)request.getAttribute("id");
+    String id = (String) request.getAttribute("id");
+    int postId = TypeConvertor.stringToInt(id);
 
-    PostDao.hitUp(id);
+    PostDao.hitUp(postId);
 
-    PostViewDto post = PostDao.findPostById(id);
+    PostViewDto post = PostDao.findPostById(postId);
     pageContext.setAttribute("post", post);
 
-    List<AttachFile> fileList = FileDao.findFiles(id);
+    List<AttachFile> fileList = FileDao.findFiles(postId);
     pageContext.setAttribute("fileList", fileList);
 
-    List<CommentDto> commentList = CommentDao.findComment(id);
+    List<CommentDto> commentList = CommentDao.findComment(postId);
     pageContext.setAttribute("commentList", commentList);
 %>
 
@@ -133,7 +135,7 @@
 <div class="wrapper">
 <h1>게시판 - 보기</h1>
 <div style="float: left">${post.writer}</div>
-    <div style="float: right;">등록일시 ${post.regDate} &nbsp; &nbsp; &nbsp; &nbsp; 수정일시 ${post.modDate}</div><br><br>
+    <div style="float: right;">등록일시 ${post.regDateToString()} &nbsp; &nbsp; &nbsp; &nbsp; 수정일시 ${post.modDateToString()}</div><br><br>
 
 <div style="float: left">[${post.category}] ${post.title}</div><div style="float: right">조회수: ${post.hit}</div><br><br>
 <dv class="content">
@@ -154,7 +156,7 @@
         <c:forEach var="comment" items="${commentList}">
         <tr>
             <td>
-            ${comment.regDate}<br>${comment.content}<br>
+            ${comment.regDateToString()}<br>${comment.content}<br>
             </td>
         </tr>
         </c:forEach>

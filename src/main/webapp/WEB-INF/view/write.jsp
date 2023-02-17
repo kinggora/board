@@ -1,11 +1,11 @@
-<%@ page import="com.example.board.dao.CategoryDao" %>
-<%@ page import="com.example.board.model.Category" %>
+<%@ page import="com.example.board.web.service.CategoryDto" %>
+<%@ page import="com.example.board.web.model.Category" %>
 <%@ page import="java.util.List" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
 <%
-    List<Category> categories = CategoryDao.getCategories();
+    List<Category> categories = CategoryDto.getCategories();
     pageContext.setAttribute("categories", categories);
 %>
 <script type="text/javascript">

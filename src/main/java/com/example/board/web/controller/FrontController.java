@@ -1,4 +1,6 @@
-package com.example.board.controller;
+package com.example.board.web.controller;
+
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,6 +12,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @WebServlet({"/board/free/*", "/boards/free/*"})
 public class FrontController extends HttpServlet {
 

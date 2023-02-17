@@ -1,22 +1,22 @@
-<%@ page import="com.example.board.dao.PostDao" %>
-<%@ page import="com.example.board.model.PostUpdateDto" %>
-<%@ page import="com.example.board.util.FileStore" %>
+<%@ page import="com.example.board.web.service.PostDao" %>
+<%@ page import="com.example.board.web.model.PostUpdateDto" %>
+<%@ page import="com.example.board.web.util.FileStore" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
-<%@ page import="com.example.board.dao.FileDao" %>
-<%@ page import="com.example.board.model.AttachFile" %>
-<%@ page import="com.example.board.validation.PostValidator" %>
+<%@ page import="com.example.board.web.service.FileDao" %>
+<%@ page import="com.example.board.web.model.AttachFile" %>
+<%@ page import="com.example.board.web.validation.PostValidator" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    String postId = (String)request.getAttribute("id");
+    String id = (String)request.getAttribute("id");
     String writer = (String)request.getAttribute("writer");
     String password = (String)request.getAttribute("password");
     String title = (String)request.getAttribute("title");
     String content = (String)request.getAttribute("content");
 
     PostValidator validator = PostValidator.builder()
-            .id(postId)
+            .id(id)
             .writer(writer)
             .password(password)
             .title(title)
@@ -28,7 +28,7 @@
         //POST update
         PostUpdateDto dto = PostUpdateDto
                 .builder()
-                .postId(postId)
+                .postId(Integer.parseInt(id))
                 .writer(writer)
                 .password(password)
                 .title(title)
@@ -48,12 +48,12 @@
 
             if(!parts.isEmpty()){
                 //파일 저장 (storage)
-                List<AttachFile> attachFiles = FileStore.uploadFiles(parts);
+                List<AttachFile> attachFiles = FileStore.uploadFiles(Integer.parseInt(id), parts);
                 //파일 정보 저장 (database)
-                FileDao.saveFile(Integer.parseInt(postId), attachFiles);
+                FileDao.saveFile(attachFiles);
             }
 
-            response.sendRedirect("/boards/free/view/" + postId);
+            response.sendRedirect("/boards/free/view/" + id);
         } else {
             pageContext.setAttribute("dto", dto);
         }

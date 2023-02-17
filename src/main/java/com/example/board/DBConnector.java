@@ -1,11 +1,19 @@
 package com.example.board;
 
+import com.example.board.mapper.CategoryMapper;
+import com.example.board.web.model.Category;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+
 import java.io.*;
 import java.net.URL;
 import java.sql.*;
-import java.util.Enumeration;
-import java.util.Properties;
+import java.util.ArrayList;
 
+@Slf4j
 public class DBConnector {
     private static final String URL = "jdbc:mariadb://localhost:3306/board";
     private static final String USERNAME = "root";

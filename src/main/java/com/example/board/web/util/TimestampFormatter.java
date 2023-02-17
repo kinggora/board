@@ -1,4 +1,4 @@
-package com.example.board.util;
+package com.example.board.web.util;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;

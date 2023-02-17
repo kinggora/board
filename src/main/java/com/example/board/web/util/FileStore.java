@@ -1,6 +1,6 @@
-package com.example.board.util;
+package com.example.board.web.util;
 
-import com.example.board.model.AttachFile;
+import com.example.board.web.model.AttachFile;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
@@ -10,7 +10,7 @@ import java.util.*;
 
 public class FileStore {
 
-    public static List<AttachFile> uploadFiles(List<Part> parts) throws IOException {
+    public static List<AttachFile> uploadFiles(int id, List<Part> parts) throws IOException {
         List<AttachFile> files = new ArrayList<>();
         for(Part part : parts){
             String origFileName = part.getSubmittedFileName();
@@ -21,6 +21,7 @@ public class FileStore {
             part.write(storeDir + storeFileName);
 
             AttachFile attachFile = AttachFile.builder()
+                    .postId(id)
                     .origName(origFileName)
                     .storeName(storeFileName)
                     .ext(extension)
