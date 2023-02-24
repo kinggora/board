@@ -1,4 +1,6 @@
 plugins {
+    id 'org.springframework.boot' version '2.7.8'
+    id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
     id 'war'
 }
@@ -17,6 +19,12 @@ ext {
 sourceCompatibility = '11'
 targetCompatibility = '11'
 
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
@@ -24,16 +32,20 @@ tasks.withType(JavaCompile) {
 dependencies {
     //compileOnly('jakarta.servlet:jakarta.servlet-api:5.0.0')
 
+    implementation('org.springframework.boot:spring-boot-starter-web')
+    testImplementation('org.springframework.boot:spring-boot-starter-test')
+
+    implementation("org.apache.tomcat.embed:tomcat-embed-jasper")
+    // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
+//    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
+//    compileOnly group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.1'
+
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
 
-    // https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api
-    compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.1.0'
-    // https://mvnrepository.com/artifact/javax.servlet.jsp/javax.servlet.jsp-api
-    compileOnly group: 'javax.servlet.jsp', name: 'javax.servlet.jsp-api', version: '2.3.1'
-
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.36'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
     compileOnly group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-core
