@@ -78,11 +78,19 @@
         <if test="categoryId != 0">
             AND p.category_id=#{categoryId}
         </if>
-        <if test="#{searchWord} != ''">
+        <if test="searchWord != null and searchWord != ''">
             AND (p.title LIKE '%${searchWord}%'
                 OR p.writer LIKE '%${searchWord}%'
-                OR p.content LIKE '%${searchWord}%'
-            )
+                OR p.content LIKE '%${searchWord}%')
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND (p.reg_date BETWEEN #{startDate} AND #{endDate})
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate == ''">
+            AND p.reg_date &gt;= #{startDate}
+        </if>
+        <if test="startDate != null and startDate == '' and endDate != null and endDate != ''">
+            AND p.reg_date &lt;= #{endDate}
         </if>
         ORDER BY p.reg_date DESC
         LIMIT #{startRow},#{pageSize}
@@ -91,13 +99,22 @@
     <select id="getPostCount" parameterType="com.example.board.web.model.SearchCriteria" resultType="int">
         SELECT COUNT(*)
         FROM post
-        <if test="#{searchWord} != ''">
+        <if test="searchWord != ''">
             WHERE (title LIKE '%${searchWord}%'
                 OR writer LIKE '%${searchWord}%'
                 OR content LIKE '%${searchWord}%')
         </if>
         <if test="categoryId != 0">
             AND category_id=#{categoryId}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+            AND reg_date BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate == ''">
+            AND reg_date &gt;= #{startDate}
+        </if>
+        <if test="startDate != null and startDate == '' and endDate != null and endDate != ''">
+            AND reg_date &lt;= #{endDate}
         </if>
     </select>
 </mapper>

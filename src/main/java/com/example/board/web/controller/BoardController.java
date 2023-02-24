@@ -1,9 +1,6 @@
 package com.example.board.web.controller;
 
-import com.example.board.web.model.AttachFile;
-import com.example.board.web.model.Category;
-import com.example.board.web.model.Post;
-import com.example.board.web.model.PostDto;
+import com.example.board.web.model.*;
 import com.example.board.web.repository.CategoryRepository;
 import com.example.board.web.repository.FileRepository;
 import com.example.board.web.repository.PostRepository;
@@ -15,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -52,7 +50,7 @@ public class BoardController {
         creationValidator.validate(dto, bindingResult);
 
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addAttribute("error", bindingResult);
+            //redirectAttributes.addAttribute("error", bindingResult);
             return "redirect:/board/free/write";
         }
 
@@ -81,69 +79,80 @@ public class BoardController {
 
     @PostMapping("/modify")
     public String modifyForm(@RequestParam int id,
+                             @RequestParam String searchQueryString,
                              Model model){
         Post post = postRepository.findPostById(id);
 
-        //수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
+        //TODO 수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
         //post.modifyPost(writer, title, content);
         model.addAttribute("post", post);
 
         List<AttachFile> fileList = fileRepository.findFiles(id);
         model.addAttribute("fileList", fileList);
+
+        model.addAttribute("searchQueryString", searchQueryString);
         return "modify";
     }
 
     @PostMapping("/modify.do")
     public String modify(@ModelAttribute PostDto dto,
                          BindingResult bindingResult,
+                         @RequestParam String searchQueryString,
                          RedirectAttributes redirectAttributes) {
 
         modifyingValidator.validate(dto, bindingResult);
 
-        if (!bindingResult.hasErrors()) {
-            //POST update
-            Post post = Post
-                    .builder()
-                    .postId(dto.getId())
-                    .writer(dto.getWriter())
-                    .password(dto.getPassword())
-                    .title(dto.getTitle())
-                    .content(dto.getContent())
-                    .modDate(new Timestamp(System.currentTimeMillis()))
-                    .build();
-
-            boolean updateResult = postRepository.updatePost(post);
-
-            //FILE update
-            if (updateResult) {
-                //파일 저장 (storage)
-                List<AttachFile> attachFiles = fileStore.uploadFiles(dto.getId(), dto.getFiles());
-                //파일 정보 저장 (database)
-                if(!attachFiles.isEmpty()){
-                    fileRepository.saveFile(attachFiles);
-                }
-                redirectAttributes.addAttribute("id", dto.getId());
-                return "redirect:/boards/free/view/{id}";
-            } else {
-                bindingResult.rejectValue("password", "mismatch");
-            }
+        if(bindingResult.hasErrors()){
+            redirectAttributes.addAttribute("id", dto.getId());
+            return "redirect:/boards/free/view/{id}";
         }
+
+        //POST update
+        Post post = Post
+                .builder()
+                .postId(dto.getId())
+                .writer(dto.getWriter())
+                .password(dto.getPassword())
+                .title(dto.getTitle())
+                .content(dto.getContent())
+                .modDate(new Timestamp(System.currentTimeMillis()))
+                .build();
+
+        boolean updateResult = postRepository.updatePost(post);
+
+        //FILE update
+        if (updateResult) {
+            //파일 저장 (storage)
+            List<AttachFile> attachFiles = fileStore.uploadFiles(dto.getId(), dto.getFiles());
+            //파일 정보 저장 (database)
+            if(!attachFiles.isEmpty()){
+                fileRepository.saveFile(attachFiles);
+            }
+            redirectAttributes.addAttribute("id", dto.getId());
+            redirectAttributes.addAttribute("searchQueryString", searchQueryString);
+            return "redirect:/boards/free/view/{id}?{searchQueryString}";
+        } else {
+            bindingResult.rejectValue("password", "mismatch");
+        }
+        //TODO 비밀번호 불일치 시 처리
         log.info("errors={}", bindingResult);
         return "modify";
     }
 
     @PostMapping("/delete.do")
-    public String delete(@RequestParam int id, @RequestParam String password, RedirectAttributes redirectAttributes){
+    public String delete(@RequestParam int id, @RequestParam String password, @RequestParam String searchQueryString, RedirectAttributes redirectAttributes){
+        redirectAttributes.addAttribute("searchQueryString", searchQueryString);
+
         //삭제 성공 -> 목록 이동
-        //삭제 실패 -> 게시글 페이지
         boolean deleteResult = postRepository.deletePost(id, password);
         if(deleteResult){
-            return "redirect:/boards/free/list";
-        } else{
-            redirectAttributes.addAttribute("id", id);
-            redirectAttributes.addAttribute("status", false);
-            return "redirect:/boards/free/view/{id}";
+            return "redirect:/boards/free/list?{searchQueryString}";
         }
+        //삭제 실패 -> 게시글 페이지
+        redirectAttributes.addAttribute("id", id);
+        redirectAttributes.addAttribute("errors", new FieldError("post", "password", "등록 시 입력한 비밀번호와 다릅니다."));
+        return "redirect:/boards/free/view/{id}?{searchQueryString}";
+
     }
 
     @PostMapping("/download.do")

@@ -4,11 +4,14 @@ import com.example.board.SqlSessionFactoryWrapper;
 import com.example.board.mapper.PostMapper;
 import com.example.board.web.util.FileStore;
 import com.example.board.web.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+@Slf4j
 @Repository
 public class PostRepository {
 
@@ -56,7 +59,6 @@ public class PostRepository {
         int totalPage = totalCount / criteria.getPageSize() + 1;
         return new PageInfo(totalCount, totalPage);
     }
-
 
     /**
      * 게시글 조회수 1 증가

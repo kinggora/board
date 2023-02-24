@@ -23,7 +23,6 @@
         if(form.password.value == ""){
             alert("비밀번호를 입력해주세요.");
             form.password.select();
-            return;
         }
         return form.submit();
     }
@@ -149,10 +148,11 @@
     </table>
 </dv>
 <dv>
+    <input type="button" value="목록" onclick="location.href='/boards/free/list?${searchQueryString}'">
     <form name="modifyForm" method="post">
         <input type="hidden" name="id" value="${post.postId}"/>
+        <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
     </form>
-    <input type="button" value="목록" onclick="location.href='/boards/free/list'">
     <input type="button" value="수정" onclick="modifyPost()">
     <input type="button" value="삭제" onclick="openPopup()">
 </dv>
@@ -164,6 +164,7 @@
             <p class="text">
                 <form name="deleteForm" method="post" action="/board/free/delete.do" onsubmit="return false">
                     <input type="hidden" name="id" value="${post.postId}"/>
+                    <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
                     비밀번호 <input type="password" name="password" placeholder="비밀번호를 입력해 주세요.">
                 </form>
             </p>

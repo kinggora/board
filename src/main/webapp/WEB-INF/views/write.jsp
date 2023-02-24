@@ -5,7 +5,6 @@
     function checkForm(){
         let form = document.write;
         let regPass = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{4,16}$/;
-
         if(form.category.value == ""){
             alert("카테고리를 선택해주세요.");
             form.category.select();
@@ -48,7 +47,7 @@
 <body>
 <h1>게시판 - 등록</h1>
 <div>
-<form name="write" action="/board/free/write.do" method="post" enctype="multipart/form-data">
+<form name="write" method="post" enctype="multipart/form-data">
     <table>
         <tr>
             <td>카테고리</td>

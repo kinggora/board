@@ -4,57 +4,34 @@
 <script type="text/javascript">
   function checkForm(){
     let form = document.modify;
-
+    let regPass = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{4,16}$/;
     if(form.writer.value == ""){
       alert("작성자를 입력해주세요.");
       form.writer.select();
-      return;
-    }
-
-    if(form.writer.value.length < 3 || form.writer.value.length >= 5){
+    } else if(form.writer.value.length < 3 || form.writer.value.length >= 5){
       alert("작성자는 3글자 이상, 5글자 미만으로 입력해주세요.");
       form.writer.select();
-      return;
-    }
-
-    if(form.password.value == ""){
+    } else if(form.password.value == ""){
       alert("등록할 때의 비밀번호를 입력해주세요.");
       form.password.select();
-      return;
-    }
-
-    let regPass = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{4,16}$/;
-    if(!regPass.test(form.password.value)){
+    } else if(!regPass.test(form.password.value)){
       alert("비밀번호는 영문/숫자/특수문자를 포함하여 4글자 이상, 16글자 미만으로 입력해주세요.");
       form.password.select();
-      return;
-    }
-
-    if(form.title.value.length < 4){
+    } else if(form.title.value.length < 4){
       alert("제목은 4글자 이상 입력해주세요.");
       form.title.select();
-      return;
-    }
-
-    if(form.title.value.length >= 100){
+    } else if(form.title.value.length >= 100){
       alert("제목으로 가능한 글자수를 초과했습니다.");
       form.title.select();
-      return;
-    }
-
-    if(form.content.value.length < 4){
+    } else if(form.content.value.length < 4){
       alert("내용은 4글자 이상 입력해주세요.");
       form.content.select();
-      return;
-    }
-
-    if(form.content.value.length > 2000){
+    } else if(form.content.value.length > 2000){
       alert("내용으로 가능한 글자수를 초과했습니다.");
       form.content.select();
-      return;
+    } else {
+      form.submit();
     }
-
-    form.submit();
   }
 
   function downloadPopup(id){
@@ -115,21 +92,19 @@
         <td>파일 첨부</td>
         <td>
           <c:forEach var="file" items="${fileList}">
-            <div>
-              <form method="post" id="${file.storeName}" action="/board/free/download.do">
-                <input type="hidden" name="storeName" value="${file.storeName}"/>
-                <input type="hidden" name="origName" value="${file.origName}"/>
-                <input type="hidden" name="storeDir" value="${file.storeDir}"/>
-                  ${file.origName}&nbsp;<input type="submit" value="Download" onclick="downloadPopup(${file.storeName});"/>
+              <form method="post" action="/board/free/download.do">
+                <input type="hidden" name="fileId" value="${file.fileId}"/>
+                  ${file.origName}&nbsp;<input type="submit" target="_blank" value="Download"/>
               </form>
               <input type="button" name="remove" value="X" onclick="deleteFile(this)"/><br>
-            </div>
           </c:forEach>
           <input type="file" name="files"/><br>
         </td>
       </tr>
     </table>
-    <input type="button" value="취소" onclick="location.href='/boards/free/view/'+${post.postId}"/>
+    <input type="button" value="취소" onclick="location.href='/boards/free/view/${post.postId}?${searchQueryString}'"/>
+
+    <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
     <input type="button" value="저장" onclick="checkForm()"/>
   </form>
 </div>
