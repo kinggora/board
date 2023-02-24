@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.board.mapper.PostMapper">
-    <insert id="savePost" parameterType="com.example.board.web.model.PostSaveDto" useGeneratedKeys="true" keyProperty="postId">
+    <insert id="savePost" parameterType="com.example.board.web.model.Post" useGeneratedKeys="true" keyProperty="postId">
         INSERT INTO post(
         category_id
         , writer
@@ -22,10 +22,11 @@
         )
     </insert>
 
-    <select id="findPostById" parameterType="int" resultType="com.example.board.web.model.PostViewDto">
+    <select id="findPostById" parameterType="int" resultType="com.example.board.web.model.Post">
         SELECT
             p.post_id AS postId
-            , c.name AS category
+            , c.category_id AS categoryId
+            , c.name AS categoryName
             , p.writer AS writer
             , p.title AS title
             , p.content AS content
@@ -42,7 +43,7 @@
         UPDATE post SET hit=hit+1 WHERE post_id=#{id}
     </update>
 
-    <update id="updatePost" parameterType="com.example.board.web.model.PostUpdateDto">
+    <update id="updatePost" parameterType="com.example.board.web.model.Post">
         UPDATE post
         SET writer=#{writer}, title=#{title}, content=#{content}, mod_date=#{modDate}
         WHERE post_id=#{postId}
@@ -59,13 +60,44 @@
         DELETE FROM post WHERE post_id=#{id}
     </delete>
 
-<!-- TODO 검색 쿼리 -->
-    <select id="getPostList" parameterType="com.example.board.web.model.PostSearch" resultType="com.example.board.web.model.PostViewDto">
-        SELECT * FROM post p
+    <select id="findPosts" parameterType="com.example.board.web.model.SearchCriteria" resultType="com.example.board.web.model.Post">
+        SELECT
+            p.post_id AS postId
+            , c.category_id AS categoryId
+            , c.name AS categoryName
+            , p.writer AS writer
+            , p.title AS title
+            , p.content AS content
+            , p.reg_date AS regDate
+            , p.mod_date AS modDate
+            , p.hit AS hit
+            , (SELECT COUNT(*) FROM FILE f WHERE f.post_id=p.post_id) AS isFileExists
+        FROM post p
         JOIN category c
         WHERE p.category_id=c.category_id
-        <if test="#{categoryId} != ''">
+        <if test="categoryId != 0">
             AND p.category_id=#{categoryId}
+        </if>
+        <if test="#{searchWord} != ''">
+            AND (p.title LIKE '%${searchWord}%'
+                OR p.writer LIKE '%${searchWord}%'
+                OR p.content LIKE '%${searchWord}%'
+            )
+        </if>
+        ORDER BY p.reg_date DESC
+        LIMIT #{startRow},#{pageSize}
+    </select>
+
+    <select id="getPostCount" parameterType="com.example.board.web.model.SearchCriteria" resultType="int">
+        SELECT COUNT(*)
+        FROM post
+        <if test="#{searchWord} != ''">
+            WHERE (title LIKE '%${searchWord}%'
+                OR writer LIKE '%${searchWord}%'
+                OR content LIKE '%${searchWord}%')
+        </if>
+        <if test="categoryId != 0">
+            AND category_id=#{categoryId}
         </if>
     </select>
 </mapper>

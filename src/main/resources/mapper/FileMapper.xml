@@ -32,16 +32,4 @@
         SELECT * FROM file WHERE post_id=#{postId}
     </select>
 
-    <select id="isAttached" parameterType="java.util.List" resultType="int">
-        SELECT post_id FROM post p WHERE EXISTS (
-            SELECT 1
-            FROM file f
-            WHERE f.post_id
-                IN
-                <foreach collection="list" item="item" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-                AND p.post_id = f.post_id
-        )
-    </select>
 </mapper>

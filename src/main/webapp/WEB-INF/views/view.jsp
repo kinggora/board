@@ -1,29 +1,5 @@
-<%@ page import="com.example.board.web.service.PostDao" %>
-<%@ page import="com.example.board.web.model.PostViewDto" %>
-<%@ page import="com.example.board.web.service.CommentDao" %>
-<%@ page import="com.example.board.web.model.CommentDto" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.example.board.web.service.FileDao" %>
-<%@ page import="com.example.board.web.model.AttachFile" %>
-<%@ page import="com.example.board.web.util.TypeConvertor" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-
-<%
-    String id = (String) request.getAttribute("id");
-    int postId = TypeConvertor.stringToInt(id);
-
-    PostDao.hitUp(postId);
-
-    PostViewDto post = PostDao.findPostById(postId);
-    pageContext.setAttribute("post", post);
-
-    List<AttachFile> fileList = FileDao.findFiles(postId);
-    pageContext.setAttribute("fileList", fileList);
-
-    List<CommentDto> commentList = CommentDao.findComment(postId);
-    pageContext.setAttribute("commentList", commentList);
-%>
 
 <script type="text/javascript">
 
@@ -38,7 +14,6 @@
         if(form.comment.value == ""){
             alert("댓글을 입력해주세요.");
             form.comment.select();
-            return;
         }
         return form.submit();
     }
@@ -137,7 +112,7 @@
 <div style="float: left">${post.writer}</div>
     <div style="float: right;">등록일시 ${post.regDateToString()} &nbsp; &nbsp; &nbsp; &nbsp; 수정일시 ${post.modDateToString()}</div><br><br>
 
-<div style="float: left">[${post.category}] ${post.title}</div><div style="float: right">조회수: ${post.hit}</div><br><br>
+<div style="float: left">[${post.categoryName}] ${post.title}</div><div style="float: right">조회수: ${post.hit}</div><br><br>
 <dv class="content">
     <p>${post.content}</p>
 </dv>
@@ -162,7 +137,7 @@
         </c:forEach>
         <tr>
             <td>
-            <form name="commentForm" method="post" action="/board/free/comment.do" onsubmit="return false">
+            <form name="commentForm" method="post" action="/boards/free/comment.do" onsubmit="return false">
                 <input type="hidden" name="id" value="${post.postId}"/>
                 <div class="input_wrap">
                     <input class="input" type="text" name="comment" maxlength="499" placeholder="댓글을 입력해 주세요."/>
@@ -198,7 +173,6 @@
             <button type="button" name="submit" onclick="checkPassword()">확인</button>
         </div>
     </div>
-    <div class="popup_dimmed"></div> <!--반투명 배경-->
 </div>
 </div>
 </body>

@@ -13,11 +13,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-@WebServlet({"/board/free/*", "/boards/free/*"})
+//@WebServlet({"/board/free/*", "/boards/free/*"})
 public class FrontController extends HttpServlet {
 
+    /**
+     * jsp 매핑 정보 (action, jsp file path)
+     */
     private Map<String, String> actionMap = new HashMap<>();
 
+    /**
+     * actionMap 초기화
+     */
     public FrontController() {
         actionMap.put("list", "/WEB-INF/view/list.jsp");
         actionMap.put("write", "/WEB-INF/view/write.jsp");
@@ -29,16 +35,18 @@ public class FrontController extends HttpServlet {
         actionMap.put("delete.do", "/WEB-INF/service/delete.do.jsp");
         actionMap.put("download.do", "/WEB-INF/service/download.do.jsp");
     }
+
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-        String[] pathParts = pathInfo.split("/"); //["", "list"], ["", "view", "{seq}"]
+        String[] pathParts = pathInfo.split("/");
         String action = pathParts[1];
 
         if(!actionMap.containsKey(action)){
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
             return;
         } else if (action.equals("view")) {
+            //["", "view", "{seq}"]
             String id = pathParts[2];
             request.setAttribute("id", id);
         }

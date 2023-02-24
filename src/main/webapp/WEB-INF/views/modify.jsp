@@ -1,31 +1,6 @@
-<%@ page import="com.example.board.web.service.PostDao" %>
-<%@ page import="com.example.board.web.model.PostViewDto" %>
-<%@ page import="com.example.board.web.service.FileDao" %>
-<%@ page import="com.example.board.web.model.AttachFile" %>
-<%@ page import="java.util.List" %>
-<%@ page import="com.example.board.web.util.TypeConvertor" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
-<%
-  String id = (String)request.getAttribute("id");
-  int postId = TypeConvertor.stringToInt(id);
-
-  PostViewDto post = PostDao.findPostById(postId);
-
-  //수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
-  String writer = request.getParameter("writer");
-  String title = request.getParameter("title");
-  String content = request.getParameter("content");
-
-  //TODO 수정 데이터 검증
-  post.modifyDto(writer, title, content);
-
-  pageContext.setAttribute("post", post);
-
-  List<AttachFile> fileList = FileDao.findFiles(postId);
-  pageContext.setAttribute("fileList", fileList);
-%>
 <script type="text/javascript">
   function checkForm(){
     let form = document.modify;
@@ -112,14 +87,14 @@
       <input type="hidden" name="id" value='${post.postId}'/>
       <tr>
         <td>카테고리</td>
-        <td>${post.category}</td>
+        <td>${post.categoryName}</td>
       </tr>
       <tr>
         <td>등록 일시</td>
-        <td>${post.regDate}</td>
+        <td>${post.regDateToString()}</td>
       </tr>
         <td>수정 일시</td>
-        <td>${post.modDate}</td>
+        <td>${post.modDateToString()       }</td>
       <tr>
         <td>작성자</td>
         <td><input type="text" name="writer" value="${post.writer}"/></td>
@@ -150,7 +125,7 @@
               <input type="button" name="remove" value="X" onclick="deleteFile(this)"/><br>
             </div>
           </c:forEach>
-          <input type="file" name="file"/><br>
+          <input type="file" name="files"/><br>
         </td>
       </tr>
     </table>
