@@ -133,7 +133,7 @@ public class BoardController {
 
             redirectAttributes.addAttribute("id", dto.getId());
             redirectAttributes.addAttribute("searchQueryString", searchQueryString);
-            return "redirect:/boards/free/view/{id}?{searchQueryString}";
+            return "redirect:/boards/free/view/{id}{searchQueryString}";
         } else {
             bindingResult.rejectValue("password", "mismatch");
         }
@@ -149,12 +149,12 @@ public class BoardController {
         //삭제 성공 -> 목록 이동
         boolean deleteResult = postRepository.deletePost(id, password);
         if(deleteResult){
-            return "redirect:/boards/free/list?{searchQueryString}";
+            return "redirect:/boards/free/list{searchQueryString}";
         }
         //삭제 실패 -> 게시글 페이지
         redirectAttributes.addAttribute("id", id);
         redirectAttributes.addAttribute("errors", new FieldError("post", "password", "등록 시 입력한 비밀번호와 다릅니다."));
-        return "redirect:/boards/free/view/{id}?{searchQueryString}";
+        return "redirect:/boards/free/view/{id}{searchQueryString}";
 
     }
 

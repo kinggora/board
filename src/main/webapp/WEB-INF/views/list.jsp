@@ -68,24 +68,24 @@
     <a class="title" style="text-decoration-line: none;" href="/boards/free/list"><h1>자유 게시판 - 목록</h1></a>
 <div>
   <form name="searchForm" onsubmit="return false">
-      <input type="date" id="startDate" name="startDate" value="${criteria.startDate}">
-      <input type="date" id="endDate" name="endDate" value="${criteria.endDate}">
+      <input type="date" id="startDate" name="startDate" value="${pageManager.criteria.startDate}">
+      <input type="date" id="endDate" name="endDate" value="${pageManager.criteria.endDate}">
       <select name="categoryId">
           <option value="0">전체 카테고리</option>
           <c:forEach var="category" items="${categories}">
-              <c:if test="${criteria.categoryId == category.id}">
+              <c:if test="${pageManager.criteria.categoryId == category.id}">
                   <option value="${category.id}" selected>${category.name}</option>
               </c:if>
-              <c:if test="${criteria.categoryId != category.id}">
+              <c:if test="${pageManager.criteria.categoryId != category.id}">
                   <option value="${category.id}">${category.name}</option>
               </c:if>
           </c:forEach>
       </select>
-      <input type="text" name="searchWord" value="${criteria.searchWord}" style="width: 300px" placeholder="검색어를 입력해 주세요. (제목+작성자+내용)">
+      <input type="text" name="searchWord" value="${pageManager.criteria.searchWord}" style="width: 300px" placeholder="검색어를 입력해 주세요. (제목+작성자+내용)">
     <button class="search_btn" onclick="search()">검색</button>
   </form>
 </div>
-<p><div style="float: left">총 ${pageInfo.totalCount}건</div>
+<p><div style="float: left">총 ${pageManager.totalCount}건</div>
     <div style="float: right"><button onclick="location.href='/board/free/write'">등록</button> </div>
     </p>
     <br >
@@ -106,7 +106,7 @@
           <c:if test="${post.fileExists}">
               <img src="../../resources/img/attach1.png"/>
           </c:if>
-        <a href="/boards/free/view/${post.postId}?${searchQueryString}">
+        <a href="/boards/free/view/${post.postId}${pageManager.generateSearchQueryString()}">
           <c:set var="title" value="${post.title}"></c:set>
             ${fn:length(title) > 80 ? (fn:substring(title,0,80) += "...") : title}
         </a></td>
@@ -119,38 +119,36 @@
 </table>
 <div style="text-align: center;font-size: 20px;">
   <p>
-<c:set var="startNum" value="${criteria.page-((criteria.page-1)%10)}"/>
-    <c:if test="${criteria.page != 1}">
-      <a href="?page=1&startDate=${criteria.startDate}&endDate=${criteria.endDate}&categoryId=${criteria.categoryId}&searchWord=${criteria.searchWord}"><<</a>
+<c:set var="startNum" value="${pageManager.startNum}"/>
+    <c:if test="${!pageManager.firstPage}">
+      <a href="${pageManager.generateFirstPageQueryString()}"><<</a>
     </c:if>
-    <c:if test="${criteria.page == 1}">
+    <c:if test="${pageManager.firstPage}">
       <a onclick="alert('첫 번째 페이지 입니다.')"><<</a>
     </c:if>
     &nbsp; &nbsp;
-    <c:if test="${startNum-10 > 0}">
-      <a href="?page=${startNum-10}&startDate=${criteria.startDate}&endDate=${criteria.endDate}&categoryId=${criteria.categoryId}&searchWord=${criteria.searchWord}"><</a>
+    <c:if test="${pageManager.prev}">
+      <a href="${pageManager.generatePrevPageQueryString()}"><</a>
     </c:if>
-    <c:if test="${startNum-10 <= 0}">
+    <c:if test="${!pageManager.prev}">
       <a onclick="alert('이전 페이지가 없습니다.')"><</a>
     </c:if>
     &nbsp; &nbsp;
-    <c:forEach var="i" begin="0" end="9">
-      <c:if test="${startNum+i <= pageInfo.totalPage}">
-        <a href="?page=${startNum+i}&startDate=${criteria.startDate}&endDate=${criteria.endDate}&categoryId=${criteria.categoryId}&searchWord=${criteria.searchWord}">${startNum+i}</a>
-      </c:if>
+    <c:forEach var="i" items="${pageManager.generatePageSequence()}">
+        <a href="${pageManager.generateSearchQueryString(i)}">${i}</a>
     </c:forEach>
     &nbsp; &nbsp;
-    <c:if test="${startNum+10 <= pageInfo.totalPage}">
-      <a href="?page=${startNum+10}&startDate=${criteria.startDate}&endDate=${criteria.endDate}&categoryId=${criteria.categoryId}&searchWord=${criteria.searchWord}">></a>
+    <c:if test="${pageManager.next}">
+      <a href="${pageManager.generateNextPageQueryString()}">></a>
     </c:if>
-    <c:if test="${startNum+10 > pageInfo.totalPage}">
+    <c:if test="${!pageManager.next}">
       <a onclick="alert('다음 페이지가 없습니다.')">></a>
     </c:if>
     &nbsp; &nbsp;
-    <c:if test="${criteria.page != pageInfo.totalPage}">
-      <a href="?page=${pageInfo.totalPage}&startDate=${criteria.startDate}&endDate=${criteria.endDate}&categoryId=${criteria.categoryId}&searchWord=${criteria.searchWord}">>></a>
+    <c:if test="${!pageManager.lastPage}">
+      <a href="${pageManager.generateLastPageQueryString()}">>></a>
     </c:if>
-    <c:if test="${criteria.page == pageInfo.totalPage}">
+    <c:if test="${pageManager.lastPage}">
       <a onclick="alert('마지막 페이지 입니다.')">>></a>
     </c:if>
   </p>

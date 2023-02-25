@@ -148,7 +148,7 @@
     </table>
 </dv>
 <dv>
-    <input type="button" value="목록" onclick="location.href='/boards/free/list?${searchQueryString}'">
+    <input type="button" value="목록" onclick="location.href='/boards/free/list${searchQueryString}'">
     <form name="modifyForm" method="post">
         <input type="hidden" name="id" value="${post.postId}"/>
         <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>

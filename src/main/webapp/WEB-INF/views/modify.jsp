@@ -105,7 +105,7 @@
         </td>
       </tr>
     </table>
-    <input type="button" value="취소" onclick="location.href='/boards/free/view/${post.postId}?${searchQueryString}'"/>
+    <input type="button" value="취소" onclick="location.href='/boards/free/view/${post.postId}${searchQueryString}'"/>
 
     <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
     <input type="button" value="저장" onclick="checkForm()"/>

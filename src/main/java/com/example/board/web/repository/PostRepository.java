@@ -53,11 +53,10 @@ public class PostRepository {
      * @param criteria 검색 조건
      * @return 페이징 정보 (총 게시글 수, 총 페이지 수)
      */
-    public PageInfo getPageInfo(SearchCriteria criteria) {
+    public PageManager getPageManager(SearchCriteria criteria) {
         PostMapper mapper = getMapper();
         int totalCount = mapper.getPostCount(criteria);
-        int totalPage = totalCount / criteria.getPageSize() + 1;
-        return new PageInfo(totalCount, totalPage);
+        return new PageManager(totalCount, criteria);
     }
 
     /**
