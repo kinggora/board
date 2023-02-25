@@ -1,6 +1,7 @@
 package com.example.board.mapper;
 
 import com.example.board.web.model.AttachFile;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -26,4 +27,10 @@ public interface FileMapper {
      */
     List<AttachFile> findFiles(int postId);
 
+    /**
+     * 게시글 수정 - 기존 첨부파일 삭제
+     * @param postId 게시글 id
+     * @param fileIds 수정 후 존재하는 파일 리스트
+     */
+    void updateDeleteFile(@Param("postId") int postId, @Param("fileIds") List<Integer> fileIds);
 }

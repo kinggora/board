@@ -68,7 +68,7 @@ public class BoardController {
 
         //FILE insert
         //파일 저장 (storage)
-        List<AttachFile> attachFiles = fileStore.uploadFiles(id, dto.getFiles());
+        List<AttachFile> attachFiles = fileStore.uploadFiles(id, dto.getNewFiles());
         //파일 정보 저장 (database)
         if(!attachFiles.isEmpty()){
             fileRepository.saveFile(attachFiles);
@@ -123,11 +123,14 @@ public class BoardController {
         //FILE update
         if (updateResult) {
             //파일 저장 (storage)
-            List<AttachFile> attachFiles = fileStore.uploadFiles(dto.getId(), dto.getFiles());
+            List<AttachFile> attachFiles = fileStore.uploadFiles(dto.getId(), dto.getNewFiles());
             //파일 정보 저장 (database)
             if(!attachFiles.isEmpty()){
                 fileRepository.saveFile(attachFiles);
             }
+            //파일 정보 업데이트
+            fileRepository.updateDeleteFile(dto.getId(), dto.getExistingFiles());
+
             redirectAttributes.addAttribute("id", dto.getId());
             redirectAttributes.addAttribute("searchQueryString", searchQueryString);
             return "redirect:/boards/free/view/{id}?{searchQueryString}";

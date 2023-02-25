@@ -71,7 +71,7 @@
             , p.reg_date AS regDate
             , p.mod_date AS modDate
             , p.hit AS hit
-            , (SELECT COUNT(*) FROM FILE f WHERE f.post_id=p.post_id) AS isFileExists
+            , (SELECT COUNT(file_id) FROM FILE f WHERE f.post_id=p.post_id) AS isFileExists
         FROM post p
         JOIN category c
         WHERE p.category_id=c.category_id

@@ -92,13 +92,16 @@
         <td>파일 첨부</td>
         <td>
           <c:forEach var="file" items="${fileList}">
+            <div>
+              <input type="hidden" name="existingFiles" value="${file.fileId}"/>
               <form method="post" action="/board/free/download.do">
-                <input type="hidden" name="fileId" value="${file.fileId}"/>
                   ${file.origName}&nbsp;<input type="submit" target="_blank" value="Download"/>
+                    <input type="hidden" name="fileId" value="${file.fileId}"/>
               </form>
               <input type="button" name="remove" value="X" onclick="deleteFile(this)"/><br>
+            </div>
           </c:forEach>
-          <input type="file" name="files"/><br>
+          <input type="file" name="newFiles"/><br>
         </td>
       </tr>
     </table>

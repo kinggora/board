@@ -78,9 +78,9 @@
         <tr>
             <td>파일 첨부</td>
             <td>
-                <input type="file" name="files" /><br>
-                <input type="file" name="files" /><br>
-                <input type="file" name="files" />
+                <input type="file" name="newFiles" /><br>
+                <input type="file" name="newFiles" /><br>
+                <input type="file" name="newFiles" />
             </td>
         </tr>
     </table>

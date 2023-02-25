@@ -6,7 +6,6 @@ import com.example.board.web.model.AttachFile;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -39,6 +38,16 @@ public class FileRepository {
     public List<AttachFile> findFiles(int postId){
         FileMapper mapper = getMapper();
         return mapper.findFiles(postId);
+    }
+
+    /**
+     * 게시글 수정 중 삭제된 첨부파일 업데이트
+     * @param postId
+     * @param fileIds 해당 게시글에 존재하는 파일 id 리스트
+     */
+    public void updateDeleteFile(int postId, List<Integer> fileIds){
+        FileMapper mapper = getMapper();
+        mapper.updateDeleteFile(postId, fileIds);
     }
 
     private FileMapper getMapper(){
