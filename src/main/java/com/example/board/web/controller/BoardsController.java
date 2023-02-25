@@ -1,10 +1,7 @@
 package com.example.board.web.controller;
 
 import com.example.board.web.model.*;
-import com.example.board.web.repository.CategoryRepository;
-import com.example.board.web.repository.CommentRepository;
-import com.example.board.web.repository.FileRepository;
-import com.example.board.web.repository.PostRepository;
+import com.example.board.web.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -21,22 +18,19 @@ import java.util.List;
 @RequestMapping("/boards/free")
 public class BoardsController {
 
-    private final PostRepository postRepository;
-    private final FileRepository fileRepository;
-    private final CommentRepository commentRepository;
-    private final CategoryRepository categoryRepository;
+    private final BoardService boardService;
 
     @GetMapping("/view/{seq}")
     public String view(@PathVariable("seq") int id, @ModelAttribute SearchCriteria criteria, Model model){
-        postRepository.hitUp(id);
+        boardService.postHitUp(id);
 
-        Post findPost = postRepository.findPostById(id);
+        Post findPost = boardService.findPostById(id);
         model.addAttribute("post", findPost);
 
-        List<AttachFile> fileList = fileRepository.findFiles(id);
+        List<AttachFile> fileList = boardService.findFiles(id);
         model.addAttribute("fileList", fileList);
 
-        List<Comment> commentList = commentRepository.findComment(id);
+        List<Comment> commentList = boardService.findComment(id);
         model.addAttribute("commentList", commentList);
 
         String searchQueryString = criteria.generateSearchQueryString();
@@ -47,13 +41,13 @@ public class BoardsController {
 
     @GetMapping("/list")
     public String list(@ModelAttribute SearchCriteria criteria, Model model){
-        List<Category> categories = categoryRepository.findCategories();
+        List<Category> categories = boardService.findCategories();
         model.addAttribute("categories", categories);
 
-        List<Post> postList = postRepository.findPosts(criteria);
+        List<Post> postList = boardService.findPosts(criteria);
         model.addAttribute("postList", postList);
 
-        PageManager pageManager = postRepository.getPageManager(criteria);
+        PageManager pageManager = boardService.getPageManager(criteria);
         model.addAttribute("pageManager", pageManager);
 
         return "list";
@@ -65,7 +59,7 @@ public class BoardsController {
                               RedirectAttributes redirectAttributes){
 
         if(StringUtils.hasText(comment)){
-            commentRepository.saveComment(id, comment);
+            boardService.saveComment(id, comment);
         }
         redirectAttributes.addAttribute("id", id);
         return "redirect:/boards/free/view/{id}";

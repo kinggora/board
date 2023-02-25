@@ -4,7 +4,6 @@ import com.example.board.web.model.AttachFile;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URL;
 import java.util.*;
@@ -45,53 +44,6 @@ public class FileStore {
             }
         }
         return files;
-    }
-
-
-    /**
-     * 스토리지에서 파일을 읽어 response body에 출력
-     * @param attachFile 다운로드할 파일 정보
-     * @param response HTTP 응답 정보
-     */
-    public void downloadFile(AttachFile attachFile, HttpServletResponse response){
-        File file = new File(attachFile.getStoreDir(), attachFile.getStoreName());
-
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        String origName = attachFile.getOrigName();
-        try {
-            origName = new String(origName.getBytes("utf-8"), "8859_1");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
-
-        response.setContentType("application/octet-stream");
-        response.setHeader("Cache-Control", "no-cache");
-        response.addHeader("Content-disposition", "attachment; fileName=" + origName);
-
-        OutputStream os = null;
-        try {
-            os = response.getOutputStream();
-            byte[] buffer = new byte[1024 * 8];
-            while(true){
-                int count = fis.read(buffer);
-                if(count == -1){
-                    break;
-                }
-                os.write(buffer, 0, count);
-            }
-            os.flush();
-
-            os.close();
-            fis.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**

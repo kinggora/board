@@ -1,4 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8"%>
 
 <script type="text/javascript">
@@ -47,33 +48,34 @@
 <body>
 <h1>게시판 - 등록</h1>
 <div>
-<form name="write" method="post" enctype="multipart/form-data">
+<form:form name="write" modelAttribute="postDto" method="post" enctype="multipart/form-data">
     <table>
         <tr>
             <td>카테고리</td>
-            <td><select name="categoryId">
-                <option value="0">카테고리 선택</option>
+            <td><form:select path="categoryId">
+                <form:option value="0">카테고리 선택</form:option>
                 <c:forEach var="c" items="${categories}">
-                    <option value="${c.id}">${c.name}</option>
+                    <form:option value="${c.id}">${c.name}</form:option>
                 </c:forEach>
-            </select></td>
+            </form:select></td>
+            <form:errors path="categoryId"/>
         </tr>
         <tr>
             <td>작성자</td>
-            <td><input type="text" name="writer"/></td>
+            <td><form:input type="text" path="writer"/><form:errors type="text" path="writer"/></td>
         </tr>
         <tr>
             <td>비밀번호</td>
-            <td><input type="password" name="password" placeholder="비밀번호"/>
-                <input type="password" name="password2" placeholder="비밀번호 확인"/></td>
+            <td><form:input type="password" path="password" placeholder="비밀번호"/><form:errors path="password"/>
+            <br ><form:input type="password" path="password2" placeholder="비밀번호 확인"/><form:errors path="password2"/></td>
         </tr>
         <tr>
             <td>제목</td>
-            <td><input type="text" name="title"/></td>
+            <td><form:input type="text" path="title"/><form:errors type="text" path="title"/></td>
         </tr>
         <tr>
             <td>내용</td>
-            <td><textarea name="content" cols="50" rows="10"></textarea></td>
+            <td><form:textarea path="content" cols="50" rows="10"/><form:errors path="content" cols="50" rows="10"/></td>
         </tr>
         <tr>
             <td>파일 첨부</td>
@@ -85,8 +87,8 @@
         </tr>
     </table>
     <input type="button" value="취소">
-    <input type="submit" value="저장" onclick="checkForm()">
-</form>
+    <input type="submit" value="저장">
+</form:form>
 </div>
 </body>
 </html>

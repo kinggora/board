@@ -30,16 +30,4 @@ public class Post {
     public String modDateToString() {
         return TimestampFormatter.timestampToString(modDate);
     }
-
-    public void modifyPost(String writer, String title, String content){
-        if(writer != null){
-            this.writer = writer;
-        }
-        if(title != null){
-            this.title = title;
-        }
-        if(content != null){
-            this.content = content;
-        }
-    }
 }

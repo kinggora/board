@@ -14,17 +14,11 @@ public class CommentRepository {
 
     /**
      * 코멘트 저장
-     * @param postId 게시글 id
-     * @param content 코멘트 내용
+     * @param comment
      */
-    public void saveComment(int postId, String content){
+    public void saveComment(Comment comment){
         CommentMapper mapper = getMapper();
-        Comment dto = Comment.builder()
-                .postId(postId)
-                .content(content)
-                .regDate(new Timestamp(System.currentTimeMillis()))
-                .build();
-        mapper.saveComment(dto);
+        mapper.saveComment(comment);
     }
 
     /**

@@ -5,7 +5,6 @@ import lombok.*;
 
 import java.sql.Timestamp;
 
-
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)

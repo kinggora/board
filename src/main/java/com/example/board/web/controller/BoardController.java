@@ -1,12 +1,9 @@
 package com.example.board.web.controller;
 
 import com.example.board.web.model.*;
-import com.example.board.web.repository.CategoryRepository;
-import com.example.board.web.repository.FileRepository;
-import com.example.board.web.repository.PostRepository;
-import com.example.board.web.util.FileStore;
-import com.example.board.web.validation.PostCreationValidator;
-import com.example.board.web.validation.PostModifyingValidator;
+import com.example.board.web.service.BoardService;
+import com.example.board.web.validation.WriteValidator;
+import com.example.board.web.validation.ModifyValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -14,12 +11,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletResponse;
-import java.sql.Timestamp;
-import java.util.ArrayList;
+import java.io.*;
 import java.util.List;
 
 @Slf4j
@@ -27,52 +22,33 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/board/free")
 public class BoardController {
-
-    private final PostRepository postRepository;
-    private final CategoryRepository categoryRepository;
-    private final FileRepository fileRepository;
-    private final PostCreationValidator creationValidator;
-    private final PostModifyingValidator modifyingValidator;
-    private final FileStore fileStore;
+    private final BoardService boardService;
+    private final WriteValidator writeValidator;
+    private final ModifyValidator modifyValidator;
 
     @GetMapping("/write")
     public String writeForm(Model model) {
-        ArrayList<Category> categories = categoryRepository.findCategories();
+        List<Category> categories = boardService.findCategories();
         model.addAttribute("categories", categories);
+        model.addAttribute("postDto", new PostDto());
         return "write";
     }
 
-    @PostMapping("/write.do")
-    public String write(@ModelAttribute PostDto dto,
+    @PostMapping("/write")
+    public String write(@ModelAttribute PostDto postDto,
                         BindingResult bindingResult,
-                        RedirectAttributes redirectAttributes) {
+                        RedirectAttributes redirectAttributes,
+                        Model model) {
 
-        creationValidator.validate(dto, bindingResult);
-
-        if (bindingResult.hasErrors()) {
-            //redirectAttributes.addAttribute("error", bindingResult);
-            return "redirect:/board/free/write";
+        writeValidator.validate(postDto, bindingResult);
+        if(bindingResult.hasErrors()){
+            log.info("errors={}", bindingResult);
+            List<Category> categories = boardService.findCategories();
+            model.addAttribute("categories", categories);
+            return "write";
         }
 
-        //POST insert
-        Post post = Post.builder()
-                .categoryId(dto.getCategoryId())
-                .writer(dto.getWriter())
-                .password(dto.getPassword())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .regDate(new Timestamp(System.currentTimeMillis()))
-                .build();
-
-        int id = postRepository.savePost(post);
-
-        //FILE insert
-        //파일 저장 (storage)
-        List<AttachFile> attachFiles = fileStore.uploadFiles(id, dto.getNewFiles());
-        //파일 정보 저장 (database)
-        if(!attachFiles.isEmpty()){
-            fileRepository.saveFile(attachFiles);
-        }
+        int id = boardService.savePost(postDto);
         redirectAttributes.addAttribute("id", id);
         return "redirect:/boards/free/view/{id}";
     }
@@ -81,13 +57,11 @@ public class BoardController {
     public String modifyForm(@RequestParam int id,
                              @RequestParam String searchQueryString,
                              Model model){
-        Post post = postRepository.findPostById(id);
 
-        //TODO 수정 시도 중 비밀번호를 틀렸을 경우 데이터 유지
-        //post.modifyPost(writer, title, content);
+        Post post = boardService.findPostById(id);
         model.addAttribute("post", post);
 
-        List<AttachFile> fileList = fileRepository.findFiles(id);
+        List<AttachFile> fileList = boardService.findFiles(id);
         model.addAttribute("fileList", fileList);
 
         model.addAttribute("searchQueryString", searchQueryString);
@@ -95,74 +69,77 @@ public class BoardController {
     }
 
     @PostMapping("/modify.do")
-    public String modify(@ModelAttribute PostDto dto,
+    public String modify(@ModelAttribute PostDto postDto,
                          BindingResult bindingResult,
                          @RequestParam String searchQueryString,
                          RedirectAttributes redirectAttributes) {
 
-        modifyingValidator.validate(dto, bindingResult);
-
+        modifyValidator.validate(postDto, bindingResult);
         if(bindingResult.hasErrors()){
-            redirectAttributes.addAttribute("id", dto.getId());
+            log.info("errors={}", bindingResult);
+            redirectAttributes.addAttribute("id", postDto.getId());
             return "redirect:/boards/free/view/{id}";
         }
 
-        //POST update
-        Post post = Post
-                .builder()
-                .postId(dto.getId())
-                .writer(dto.getWriter())
-                .password(dto.getPassword())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .modDate(new Timestamp(System.currentTimeMillis()))
-                .build();
-
-        boolean updateResult = postRepository.updatePost(post);
-
-        //FILE update
-        if (updateResult) {
-            //파일 저장 (storage)
-            List<AttachFile> attachFiles = fileStore.uploadFiles(dto.getId(), dto.getNewFiles());
-            //파일 정보 저장 (database)
-            if(!attachFiles.isEmpty()){
-                fileRepository.saveFile(attachFiles);
-            }
-            //파일 정보 업데이트
-            fileRepository.updateDeleteFile(dto.getId(), dto.getExistingFiles());
-
-            redirectAttributes.addAttribute("id", dto.getId());
-            redirectAttributes.addAttribute("searchQueryString", searchQueryString);
-            return "redirect:/boards/free/view/{id}{searchQueryString}";
-        } else {
+        boolean checkPassword = boardService.updatePost(postDto);
+        if (!checkPassword) {
+            //TODO 비밀번호 불일치 시 처리
             bindingResult.rejectValue("password", "mismatch");
+            log.info("errors={}", bindingResult);
         }
-        //TODO 비밀번호 불일치 시 처리
-        log.info("errors={}", bindingResult);
-        return "modify";
+        redirectAttributes.addAttribute("id", postDto.getId());
+        redirectAttributes.addAttribute("searchQueryString", searchQueryString);
+        return "redirect:/boards/free/view/{id}{searchQueryString}";
     }
 
     @PostMapping("/delete.do")
     public String delete(@RequestParam int id, @RequestParam String password, @RequestParam String searchQueryString, RedirectAttributes redirectAttributes){
         redirectAttributes.addAttribute("searchQueryString", searchQueryString);
 
-        //삭제 성공 -> 목록 이동
-        boolean deleteResult = postRepository.deletePost(id, password);
-        if(deleteResult){
+        boolean checkPassword = boardService.deletePost(id, password);
+        if(checkPassword){
             return "redirect:/boards/free/list{searchQueryString}";
         }
-        //삭제 실패 -> 게시글 페이지
         redirectAttributes.addAttribute("id", id);
         redirectAttributes.addAttribute("errors", new FieldError("post", "password", "등록 시 입력한 비밀번호와 다릅니다."));
         return "redirect:/boards/free/view/{id}{searchQueryString}";
-
     }
 
     @PostMapping("/download.do")
     public void downloadFile(@RequestParam int fileId, HttpServletResponse response){
-        AttachFile findFile = fileRepository.findFileById(fileId);
-        if(findFile != null){
-            fileStore.downloadFile(findFile, response);
+        AttachFile attachFile = boardService.findFileById(fileId);
+
+        if(attachFile != null){
+            File file = new File(attachFile.getStoreDir(), attachFile.getStoreName());
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(file);
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+            OutputStream os = null;
+            try {
+                os = response.getOutputStream();
+                byte[] buffer = new byte[1024 * 8];
+                while(true){
+                    int count = fis.read(buffer);
+                    if(count == -1){
+                        break;
+                    }
+                    os.write(buffer, 0, count);
+                }
+                os.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } finally {
+                try {
+                    fis.close();
+                    os.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
+
 }

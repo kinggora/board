@@ -3,6 +3,7 @@ package com.example.board.web.validation;
 import com.example.board.web.model.PostDto;
 import lombok.Builder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -10,7 +11,7 @@ import java.util.regex.Pattern;
 
 @Builder
 @Component
-public class PostCreationValidator implements Validator {
+public class WriteValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -31,11 +32,9 @@ public class PostCreationValidator implements Validator {
         /**
          * 작성자 검증
          */
-        if(post.getWriter() == null || post.getWriter().isBlank()){
+        if(!StringUtils.hasText(post.getWriter())){
             errors.rejectValue("writer", "required");
-        }
-
-        if(post.getWriter().length() < 3 || post.getWriter().length() >= 5 || post.getWriter().contains(" ")){
+        } else if(post.getWriter().length() < 3 || post.getWriter().length() >= 5 || post.getWriter().contains(" ")){
             errors.rejectValue("writer", "range");
         }
 
@@ -55,22 +54,18 @@ public class PostCreationValidator implements Validator {
         /**
          * 제목 검증
          */
-        if(post.getTitle() == null || post.getTitle().isBlank() || post.getTitle().length() < 4 ){
+        if(!StringUtils.hasText(post.getTitle()) || post.getTitle().length() < 4 ){
             errors.rejectValue("title", "min");
-        }
-
-        if(post.getTitle().length() >= 100){
+        } else if(post.getTitle().length() >= 100){
             errors.rejectValue("title", "over");
         }
 
         /**
          * 내용 검증
          */
-        if(post.getContent() == null || post.getContent().isBlank() || post.getContent().length() < 4){
+        if(!StringUtils.hasText(post.getContent()) || post.getContent().length() < 4){
             errors.rejectValue("content", "min");
-        }
-
-        if(post.getContent().length() > 2000){
+        } else if(post.getContent().length() > 2000){
             errors.rejectValue("content", "over");
         }
 
