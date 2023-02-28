@@ -1,6 +1,8 @@
 package com.example.board.web.util;
 
 import com.example.board.web.model.AttachFile;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +12,9 @@ import java.util.*;
 
 @Component
 public class FileStore {
+
+    @Value("${file.storage}")
+    private String storagePath;
 
     /**
      * 첨부 파일을 스토리지에 업로드
@@ -24,7 +29,7 @@ public class FileStore {
                 String origFileName = multipartFile.getOriginalFilename();
                 String extension = extracted(origFileName);
                 String storeFileName = createStoreFileName(extension);
-                String storeDir = getStoragePath() + File.separator;
+                String storeDir = storagePath + File.separator;
 
                 File saveFile = new File(storeDir, storeFileName);
                 try {
@@ -44,21 +49,6 @@ public class FileStore {
             }
         }
         return files;
-    }
-
-    /**
-     * 프로퍼티 파일 읽어 스토리지 경로 반환
-     * @return 스토리지 경로
-     */
-    private String getStoragePath() {
-        URL resource = FileStore.class.getClassLoader().getResource("application.properties");
-        Properties properties = new Properties();
-        try {
-            properties.load(resource.openStream());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties.getProperty("file.storage");
     }
 
     /**
@@ -91,5 +81,20 @@ public class FileStore {
     private String extracted(String fileName){
         int pos = fileName.lastIndexOf(".");
         return fileName.substring(pos+1);
+    }
+
+    /**
+     * 프로퍼티 파일 읽어 스토리지 경로 반환
+     * @return 스토리지 경로
+     */
+    private String getStoragePath() {
+        URL resource = FileStore.class.getClassLoader().getResource("application.properties");
+        Properties properties = new Properties();
+        try {
+            properties.load(resource.openStream());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return properties.getProperty("file.storage");
     }
 }
