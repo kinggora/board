@@ -3,20 +3,23 @@ package com.example.board.web.repository;
 import com.example.board.SqlSessionFactoryWrapper;
 import com.example.board.mapper.FileMapper;
 import com.example.board.web.model.AttachFile;
+import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
+@RequiredArgsConstructor
 public class FileRepository {
+
+    private final FileMapper mapper;
 
     /**
      * DB에 첨부 파일 정보 저장
      * @param files 파일 정보 리스트
      */
     public void saveFile(List<AttachFile> files) {
-        FileMapper mapper = getMapper();
         mapper.saveFile(files);
     }
 
@@ -26,7 +29,6 @@ public class FileRepository {
      * @return 파일 정보
      */
     public AttachFile findFileById(int id){
-        FileMapper mapper = getMapper();
         return mapper.findFileById(id);
     }
 
@@ -36,7 +38,6 @@ public class FileRepository {
      * @return 파일 정보 리스트
      */
     public List<AttachFile> findFiles(int postId){
-        FileMapper mapper = getMapper();
         return mapper.findFiles(postId);
     }
 
@@ -46,7 +47,6 @@ public class FileRepository {
      * @param fileIds 해당 게시글에 존재하는 파일 id 리스트
      */
     public void updateDeleteFile(int postId, List<Integer> fileIds){
-        FileMapper mapper = getMapper();
         mapper.updateDeleteFile(postId, fileIds);
     }
 

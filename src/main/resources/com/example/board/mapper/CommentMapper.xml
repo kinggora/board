@@ -3,11 +3,11 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.board.mapper.CommentMapper">
-    <insert id="saveComment" parameterType="com.example.board.web.model.Comment" >
+    <insert id="saveComment" parameterType="Comment" >
         INSERT INTO comment(post_id, content, reg_date) VALUES (#{postId},#{content},#{regDate})
     </insert>
 
-    <select id="findComment" parameterType="int" resultType="com.example.board.web.model.Comment">
+    <select id="findComment" parameterType="int" resultType="Comment">
         SELECT * FROM comment WHERE post_id=#{postId}
     </select>
 </mapper>

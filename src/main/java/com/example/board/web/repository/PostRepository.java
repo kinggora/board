@@ -3,6 +3,7 @@ package com.example.board.web.repository;
 import com.example.board.SqlSessionFactoryWrapper;
 import com.example.board.mapper.PostMapper;
 import com.example.board.web.model.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSession;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,10 @@ import java.util.List;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 public class PostRepository {
+
+    private final PostMapper mapper;
 
     /**
      * 게시글 저장
@@ -19,7 +23,6 @@ public class PostRepository {
      * @return 저장된 레코드의 primary key 값
      */
     public int savePost(Post dto){
-        PostMapper mapper = getMapper();
         mapper.savePost(dto);
         return dto.getPostId();
     }
@@ -30,7 +33,6 @@ public class PostRepository {
      * @return 조회한 게시글 정보
      */
     public Post findPostById(int id){
-        PostMapper mapper = getMapper();
         return mapper.findPostById(id);
     }
 
@@ -40,7 +42,6 @@ public class PostRepository {
      * @return 게시글 정보 리스트
      */
     public List<Post> findPosts(SearchCriteria criteria) {
-        PostMapper mapper = getMapper();
         return mapper.findPosts(criteria);
     }
 
@@ -50,7 +51,6 @@ public class PostRepository {
      * @return 페이징 정보 (총 게시글 수, 총 페이지 수)
      */
     public int getPostCount(SearchCriteria criteria) {
-        PostMapper mapper = getMapper();
         return mapper.getPostCount(criteria);
     }
 
@@ -59,7 +59,6 @@ public class PostRepository {
      * @param id 게시글 id
      */
     public void hitUp(int id){
-        PostMapper mapper = getMapper();
         mapper.hitUp(id);
     }
 
@@ -68,7 +67,6 @@ public class PostRepository {
      * @param dto 수정할 게시글 정보
      */
     public void updatePost(Post dto){
-        PostMapper mapper = getMapper();
         mapper.updatePost(dto);
     }
 
@@ -80,7 +78,6 @@ public class PostRepository {
     // TODO : 삭제 flag 처리
     public boolean deletePost(int postId){
         //Post Database (Comment, File)
-        PostMapper mapper = getMapper();
         mapper.deletePost(postId);
         return true;
     }
@@ -92,7 +89,6 @@ public class PostRepository {
      * @return 비밀번호 일치 여부 (true:일치, false:불일치)
      */
     public boolean checkPassword(int postId, String password) {
-        PostMapper mapper = getMapper();
         int count = mapper.checkPassword(postId, password);
         return count == 1;
     }

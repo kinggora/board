@@ -2,10 +2,12 @@ package com.example.board.mapper;
 
 import com.example.board.web.model.Post;
 import com.example.board.web.model.SearchCriteria;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface PostMapper {
 
     /**

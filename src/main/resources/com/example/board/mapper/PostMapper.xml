@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.board.mapper.PostMapper">
-    <insert id="savePost" parameterType="com.example.board.web.model.Post" useGeneratedKeys="true" keyProperty="postId">
+    <insert id="savePost" parameterType="Post" useGeneratedKeys="true" keyProperty="postId">
         INSERT INTO post(
         category_id
         , writer
@@ -22,7 +22,7 @@
         )
     </insert>
 
-    <select id="findPostById" parameterType="int" resultType="com.example.board.web.model.Post">
+    <select id="findPostById" parameterType="int" resultType="Post">
         SELECT
             p.post_id AS postId
             , c.category_id AS categoryId
@@ -43,7 +43,7 @@
         UPDATE post SET hit=hit+1 WHERE post_id=#{id}
     </update>
 
-    <update id="updatePost" parameterType="com.example.board.web.model.Post">
+    <update id="updatePost" parameterType="Post">
         UPDATE post
         SET writer=#{writer}, title=#{title}, content=#{content}, mod_date=#{modDate}
         WHERE post_id=#{postId}
@@ -60,7 +60,7 @@
         DELETE FROM post WHERE post_id=#{id}
     </delete>
 
-    <select id="findPosts" parameterType="com.example.board.web.model.SearchCriteria" resultType="com.example.board.web.model.Post">
+    <select id="findPosts" parameterType="SearchCriteria" resultType="Post">
         SELECT
             p.post_id AS postId
             , c.category_id AS categoryId
@@ -75,7 +75,7 @@
         FROM post p
         JOIN category c
         WHERE p.category_id=c.category_id
-        <if test="categoryId != 0">
+        <if test="categoryId != null">
             AND p.category_id=#{categoryId}
         </if>
         <if test="searchWord != null and searchWord != ''">
@@ -96,25 +96,29 @@
         LIMIT #{startRow},#{pageSize}
     </select>
 
-    <select id="getPostCount" parameterType="com.example.board.web.model.SearchCriteria" resultType="int">
-        SELECT COUNT(*)
+    <select id="getPostCount" parameterType="SearchCriteria" resultType="int">
+        SELECT COUNT(post_id)
         FROM post
-        <if test="searchWord != ''">
-            WHERE (title LIKE '%${searchWord}%'
-                OR writer LIKE '%${searchWord}%'
-                OR content LIKE '%${searchWord}%')
-        </if>
-        <if test="categoryId != 0">
-            AND category_id=#{categoryId}
-        </if>
-        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
-            AND reg_date BETWEEN #{startDate} AND #{endDate}
-        </if>
-        <if test="startDate != null and startDate != '' and endDate != null and endDate == ''">
-            AND reg_date &gt;= #{startDate}
-        </if>
-        <if test="startDate != null and startDate == '' and endDate != null and endDate != ''">
-            AND reg_date &lt;= #{endDate}
-        </if>
+        <where>
+            <if test="searchWord != null and searchWord != ''">
+                (title LIKE '%${searchWord}%'
+                    OR writer LIKE '%${searchWord}%'
+                    OR content LIKE '%${searchWord}%')
+            </if>
+            <if test="categoryId != null">
+                AND category_id=#{categoryId}
+            </if>
+            <choose>
+                <when test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+                    AND reg_date BETWEEN #{startDate} AND #{endDate}
+                </when>
+                <when test="startDate != null and startDate != '' and endDate != null and endDate == ''">
+                    AND reg_date &gt;= #{startDate}
+                </when>
+                <when test="startDate != null and startDate == '' and endDate != null and endDate != ''">
+                    AND reg_date &lt;= #{endDate}
+                </when>
+            </choose>
+        </where>
     </select>
 </mapper>

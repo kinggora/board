@@ -1,9 +1,11 @@
 package com.example.board.mapper;
 
 import com.example.board.web.model.Comment;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.ArrayList;
 
+@Mapper
 public interface CommentMapper {
 
     /**

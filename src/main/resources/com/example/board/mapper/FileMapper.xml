@@ -24,11 +24,11 @@
         </foreach>
     </insert>
 
-    <select id="findFileById" parameterType="int" resultType="com.example.board.web.model.AttachFile">
+    <select id="findFileById" parameterType="int" resultType="AttachFile">
         SELECT * FROM file WHERE file_id=#{id} LIMIT 1
     </select>
 
-    <select id="findFiles" parameterType="int" resultType="com.example.board.web.model.AttachFile">
+    <select id="findFiles" parameterType="int" resultType="AttachFile">
         SELECT * FROM file WHERE post_id=#{postId}
     </select>
 
