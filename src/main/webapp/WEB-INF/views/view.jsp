@@ -5,7 +5,7 @@
 
     function modifyPost(){
         let form = document.modifyForm;
-        form.action = "/board/free/modify";
+        form.action = "/boards/free/modify";
         return form.submit();
     }
 
@@ -117,7 +117,7 @@
 </dv>
 <dv>
     <c:forEach var="file" items="${fileList}">
-        <form method="post" action="/board/free/download.do">
+        <form method="post" action="/boards/free/download.do">
             <input type="hidden" name="fileId" value="${file.fileId}"/>
             <input type="submit" value="${file.origName}" target="_blank"/><br >
         </form>
@@ -148,10 +148,14 @@
     </table>
 </dv>
 <dv>
-    <input type="button" value="목록" onclick="location.href='/boards/free/list${searchQueryString}'">
+    <input type="button" value="목록" onclick="location.href='/boards/free/list?${criteria.generateSearchQueryString()}'">
     <form name="modifyForm" method="post">
         <input type="hidden" name="id" value="${post.postId}"/>
-        <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
+        <input type="hidden" name="page" value="${criteria.page}"/>
+        <input type="hidden" name="categoryId" value="${criteria.categoryId}"/>
+        <input type="hidden" name="searchWord" value="${criteria.searchWord}"/>
+        <input type="hidden" name="startDate" value="${criteria.startDate}"/>
+        <input type="hidden" name="endDate" value="${criteria.endDate}"/>
     </form>
     <input type="button" value="수정" onclick="modifyPost()">
     <input type="button" value="삭제" onclick="openPopup()">
@@ -162,9 +166,13 @@
     <div class="popup_box"> <!--팝업창-->
         <div class="popup_cont"><!--텍스트 영역-->
             <p class="text">
-                <form name="deleteForm" method="post" action="/board/free/delete.do" onsubmit="return false">
+                <form name="deleteForm" method="post" action="/boards/free/delete.do" onsubmit="return false">
                     <input type="hidden" name="id" value="${post.postId}"/>
-                    <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
+                    <input type="hidden" name="page" value="${criteria.page}"/>
+                    <input type="hidden" name="categoryId" value="${criteria.categoryId}"/>
+                    <input type="hidden" name="searchWord" value="${criteria.searchWord}"/>
+                    <input type="hidden" name="startDate" value="${criteria.startDate}"/>
+                    <input type="hidden" name="endDate" value="${criteria.endDate}"/>
                     비밀번호 <input type="password" name="password" placeholder="비밀번호를 입력해 주세요.">
                 </form>
             </p>

@@ -60,7 +60,7 @@
 <body>
 <h1>게시판 - 수정</h1>
 <div>
-  <form name="modify" method="post" action="/board/free/modify.do" enctype="multipart/form-data" onsubmit="return false;">
+  <form name="modify" method="post" action="/boards/free/modify.do" enctype="multipart/form-data" onsubmit="return false;">
     <table>
       <input type="hidden" name="id" value='${post.postId}'/>
       <tr>
@@ -72,7 +72,7 @@
         <td>${post.regDateToString()}</td>
       </tr>
         <td>수정 일시</td>
-        <td>${post.modDateToString()       }</td>
+        <td>${post.modDateToString()}</td>
       <tr>
         <td>작성자</td>
         <td><input type="text" name="writer" value="${post.writer}"/></td>
@@ -95,7 +95,7 @@
           <c:forEach var="file" items="${fileList}">
             <div>
               <input type="hidden" name="existingFiles" value="${file.fileId}"/>
-              <form method="post" action="/board/free/download.do">
+              <form method="post" action="/boards/free/download.do">
                   ${file.origName}&nbsp;<input type="submit" target="_blank" value="Download"/>
                     <input type="hidden" name="fileId" value="${file.fileId}"/>
               </form>
@@ -106,9 +106,13 @@
         </td>
       </tr>
     </table>
-    <input type="button" value="취소" onclick="location.href='/boards/free/view/${post.postId}${searchQueryString}'"/>
+    <input type="button" value="취소" onclick="location.href='/boards/free/view/${post.postId}?${criteria.generateSearchQueryString()}'"/>
 
-    <input type="hidden" name="searchQueryString" value="${searchQueryString}"/>
+    <input type="hidden" name="page" value="${criteria.page}"/>
+    <input type="hidden" name="categoryId" value="${criteria.categoryId}"/>
+    <input type="hidden" name="searchWord" value="${criteria.searchWord}"/>
+    <input type="hidden" name="startDate" value="${criteria.startDate}"/>
+    <input type="hidden" name="endDate" value="${criteria.endDate}"/>
     <input type="button" value="저장" onclick="checkForm()"/>
   </form>
 </div>

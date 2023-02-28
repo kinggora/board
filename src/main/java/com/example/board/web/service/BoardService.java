@@ -1,5 +1,6 @@
 package com.example.board.web.service;
 
+import com.example.board.web.exception.InvalidPasswordException;
 import com.example.board.web.model.*;
 import com.example.board.web.repository.CategoryRepository;
 import com.example.board.web.repository.CommentRepository;
@@ -36,9 +37,9 @@ public class BoardService {
         return id;
     }
 
-    public boolean updatePost(PostDto dto){
+    public void updatePost(PostDto dto){
         if(!postRepository.checkPassword(dto.getId(), dto.getPassword())){
-            return false;
+            throw new InvalidPasswordException();
         }
         Post post = Post
                 .builder()
@@ -52,17 +53,15 @@ public class BoardService {
         postRepository.updatePost(post);
         fileRepository.updateDeleteFile(dto.getId(), dto.getExistingFiles());
         saveFile(dto.getId(), dto.getNewFiles());
-        return true;
     }
 
-    public boolean deletePost(int postId, String password){
+    public void deletePost(int postId, String password){
         if(!postRepository.checkPassword(postId, password)){
-            return false;
+            throw new InvalidPasswordException();
         }
         List<AttachFile> files = fileRepository.findFiles(postId);
         fileStore.deleteFiles(files);
         postRepository.deletePost(postId);
-        return true;
     }
 
     public PageManager getPageManager(SearchCriteria criteria){

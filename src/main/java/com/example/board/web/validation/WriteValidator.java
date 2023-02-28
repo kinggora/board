@@ -22,14 +22,14 @@ public class WriteValidator implements Validator {
     public void validate(Object target, Errors errors) {
         PostDto post = (PostDto) target;
 
-        /**
+        /*
          * 카테고리 검증
          */
-        if(post.getCategoryId() == 0){
+        if(post.getCategoryId() == null){
             errors.rejectValue("categoryId", "required");
         }
 
-        /**
+        /*
          * 작성자 검증
          */
         if(!StringUtils.hasText(post.getWriter())){
@@ -38,7 +38,7 @@ public class WriteValidator implements Validator {
             errors.rejectValue("writer", "range");
         }
 
-        /**
+        /*
          * 비밀번호 검증
          */
         if(!post.getPassword().equals(post.getPassword2())){
@@ -51,7 +51,7 @@ public class WriteValidator implements Validator {
             errors.rejectValue("password", "regex");
         }
 
-        /**
+        /*
          * 제목 검증
          */
         if(!StringUtils.hasText(post.getTitle()) || post.getTitle().length() < 4 ){
@@ -60,7 +60,7 @@ public class WriteValidator implements Validator {
             errors.rejectValue("title", "over");
         }
 
-        /**
+        /*
          * 내용 검증
          */
         if(!StringUtils.hasText(post.getContent()) || post.getContent().length() < 4){

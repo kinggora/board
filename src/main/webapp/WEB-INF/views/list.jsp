@@ -71,7 +71,7 @@
       <input type="date" id="startDate" name="startDate" value="${pageManager.criteria.startDate}">
       <input type="date" id="endDate" name="endDate" value="${pageManager.criteria.endDate}">
       <select name="categoryId">
-          <option value="0">전체 카테고리</option>
+          <option value="">전체 카테고리</option>
           <c:forEach var="category" items="${categories}">
               <c:if test="${pageManager.criteria.categoryId == category.id}">
                   <option value="${category.id}" selected>${category.name}</option>
@@ -86,7 +86,7 @@
   </form>
 </div>
 <p><div style="float: left">총 ${pageManager.totalCount}건</div>
-    <div style="float: right"><button onclick="location.href='/board/free/write'">등록</button> </div>
+    <div style="float: right"><button onclick="location.href='/boards/free/write'">등록</button> </div>
     </p>
     <br >
     <br >
@@ -106,7 +106,7 @@
           <c:if test="${post.fileExists}">
               <img src="../../resources/img/attach1.png"/>
           </c:if>
-        <a href="/boards/free/view/${post.postId}${pageManager.generateSearchQueryString()}">
+        <a href="/boards/free/view/${post.postId}?${pageManager.generateSearchQueryString()}">
           <c:set var="title" value="${post.title}"></c:set>
             ${fn:length(title) > 80 ? (fn:substring(title,0,80) += "...") : title}
         </a></td>
@@ -121,32 +121,32 @@
   <p>
 <c:set var="startNum" value="${pageManager.startNum}"/>
     <c:if test="${!pageManager.firstPage}">
-      <a href="${pageManager.generateFirstPageQueryString()}"><<</a>
+      <a href="?${pageManager.generateFirstPageQueryString()}"><<</a>
     </c:if>
     <c:if test="${pageManager.firstPage}">
       <a onclick="alert('첫 번째 페이지 입니다.')"><<</a>
     </c:if>
     &nbsp; &nbsp;
     <c:if test="${pageManager.prev}">
-      <a href="${pageManager.generatePrevPageQueryString()}"><</a>
+      <a href="?${pageManager.generatePrevPageQueryString()}"><</a>
     </c:if>
     <c:if test="${!pageManager.prev}">
       <a onclick="alert('이전 페이지가 없습니다.')"><</a>
     </c:if>
     &nbsp; &nbsp;
     <c:forEach var="i" items="${pageManager.generatePageSequence()}">
-        <a href="${pageManager.generateSearchQueryString(i)}">${i}</a>
+        <a href="?${pageManager.generateSearchQueryString(i)}">${i}</a>
     </c:forEach>
     &nbsp; &nbsp;
     <c:if test="${pageManager.next}">
-      <a href="${pageManager.generateNextPageQueryString()}">></a>
+      <a href="?${pageManager.generateNextPageQueryString()}">></a>
     </c:if>
     <c:if test="${!pageManager.next}">
       <a onclick="alert('다음 페이지가 없습니다.')">></a>
     </c:if>
     &nbsp; &nbsp;
     <c:if test="${!pageManager.lastPage}">
-      <a href="${pageManager.generateLastPageQueryString()}">>></a>
+      <a href="?${pageManager.generateLastPageQueryString()}">>></a>
     </c:if>
     <c:if test="${pageManager.lastPage}">
       <a onclick="alert('마지막 페이지 입니다.')">>></a>
