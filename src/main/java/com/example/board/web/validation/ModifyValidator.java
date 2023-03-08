@@ -34,7 +34,9 @@ public class ModifyValidator implements Validator {
          */
         String regex = "^(?=.*[A-Za-z])(?=.*[0-9])(?=.*[$@$!%*#?&])[A-Za-z[0-9]$@$!%*#?&]{4,16}$";
         Pattern pattern = Pattern.compile(regex);
-        if(!pattern.matcher(post.getPassword()).matches()){
+        if(!StringUtils.hasText(post.getPassword())){
+            errors.rejectValue("password", "required");
+        } else if(!pattern.matcher(post.getPassword()).matches()){
             errors.rejectValue("password", "regex");
         }
 

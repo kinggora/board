@@ -28,7 +28,7 @@ public interface PostMapper {
      * @param sc 검색 조건
      * @return 게시글 정보 리스트
      */
-    List<Post> findPosts(SearchCriteria sc);
+    List<Post> findPosts(@Param("criteria") SearchCriteria sc, @Param("limit") int limit, @Param("offset") int offset);
 
     /**
      * 검색 조건에 해당하는 게시글 개수 조회

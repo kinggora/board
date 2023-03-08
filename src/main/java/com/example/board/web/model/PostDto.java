@@ -20,5 +20,6 @@ public class PostDto {
     private String content;
     private List<MultipartFile> newFiles = new ArrayList<>();
     private List<Integer> existingFiles = new ArrayList<>();
+    private List<Integer> deletedFiles = new ArrayList<>();
 }
 

@@ -4,7 +4,7 @@ import lombok.Data;
 import org.springframework.util.StringUtils;
 
 @Data
-public class SearchCriteria extends Criteria{
+public class SearchCriteria {
     private Integer page = 1;
     private Integer categoryId;
     private String searchWord;

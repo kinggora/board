@@ -35,7 +35,7 @@
     <delete id="updateDeleteFile" parameterType="map">
         DELETE FROM file WHERE post_id=#{postId}
         <if test="fileIds != null and fileIds.size != 0">
-            AND file_id NOT IN
+            AND file_id IN
             <foreach collection="fileIds" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>

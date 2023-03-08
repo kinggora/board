@@ -9,11 +9,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class PageManager {
+    public static int PAGE_SIZE = 10;
     private int totalCount;
     private SearchCriteria criteria;
 
     public int getTotalPage(){
-        return totalCount / criteria.getPageSize() + 1;
+        return totalCount / PAGE_SIZE + 1;
     }
 
     public int getStartNum(){

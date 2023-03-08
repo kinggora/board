@@ -51,7 +51,7 @@ public class BoardService {
                 .modDate(new Timestamp(System.currentTimeMillis()))
                 .build();
         postRepository.updatePost(post);
-        fileRepository.updateDeleteFile(dto.getId(), dto.getExistingFiles());
+        fileRepository.updateDeleteFile(dto.getId(), dto.getDeletedFiles());
         saveFile(dto.getId(), dto.getNewFiles());
     }
 
@@ -74,9 +74,8 @@ public class BoardService {
     }
 
     public List<Post> findPosts(SearchCriteria criteria){
-        int startRow = (criteria.getPage() - 1) * criteria.getPageSize();
-        criteria.setStartRow(startRow);
-        return postRepository.findPosts(criteria);
+        int startRow = (criteria.getPage() - 1) * PageManager.PAGE_SIZE;
+        return postRepository.findPosts(criteria, PageManager.PAGE_SIZE, startRow);
     }
 
     public void postHitUp(int id){
@@ -99,12 +98,7 @@ public class BoardService {
         return commentRepository.findComment(postId);
     }
 
-    public void saveComment(int postId, String content){
-        Comment comment = Comment.builder()
-                .postId(postId)
-                .content(content)
-                .regDate(new Timestamp(System.currentTimeMillis()))
-                .build();
+    public void saveComment(Comment comment){
         commentRepository.saveComment(comment);
     }
 

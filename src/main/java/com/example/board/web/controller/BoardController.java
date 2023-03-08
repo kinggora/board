@@ -142,14 +142,12 @@ public class BoardController {
     }
 
     @PostMapping("/comment.do")
-    public String saveComment(@RequestParam int id,
-                              @RequestParam String comment,
+    public String saveComment(@ModelAttribute Comment comment,
                               RedirectAttributes redirectAttributes){
-
-        if(StringUtils.hasText(comment)){
-            boardService.saveComment(id, comment);
+        if(comment.getPostId() != null && StringUtils.hasText(comment.getContent())){
+            boardService.saveComment(comment);
         }
-        redirectAttributes.addAttribute("id", id);
+        redirectAttributes.addAttribute("id", comment.getPostId());
         return "redirect:/boards/free/view/{id}";
     }
 

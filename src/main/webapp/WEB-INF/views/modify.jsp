@@ -34,7 +34,6 @@
       form.submit();
     }
   }
-
   function downloadPopup(id){
     let popup = window.open("","myWindow","width=100, height=100");
     let form = document.getElementById(id);
@@ -47,7 +46,6 @@
     }
     form.submit();
   }
-
   function deleteFile(obj) {
     let div = obj.closest("div");
     div.remove();
@@ -71,8 +69,8 @@
         <td>등록 일시</td>
         <td>${post.regDateToString()}</td>
       </tr>
-        <td>수정 일시</td>
-        <td>${post.modDateToString()}</td>
+      <td>수정 일시</td>
+      <td>${post.modDateToString()}</td>
       <tr>
         <td>작성자</td>
         <td><input type="text" name="writer" value="${post.writer}"/></td>
@@ -97,7 +95,7 @@
               <input type="hidden" name="existingFiles" value="${file.fileId}"/>
               <form method="post" action="/boards/free/download.do">
                   ${file.origName}&nbsp;<input type="submit" target="_blank" value="Download"/>
-                    <input type="hidden" name="fileId" value="${file.fileId}"/>
+                <input type="hidden" name="fileId" value="${file.fileId}"/>
               </form>
               <input type="button" name="remove" value="X" onclick="deleteFile(this)"/><br>
             </div>

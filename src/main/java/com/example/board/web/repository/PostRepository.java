@@ -41,8 +41,8 @@ public class PostRepository {
      * @param criteria 검색 조건
      * @return 게시글 정보 리스트
      */
-    public List<Post> findPosts(SearchCriteria criteria) {
-        return mapper.findPosts(criteria);
+    public List<Post> findPosts(SearchCriteria criteria, int pageSize, int startRow) {
+        return mapper.findPosts(criteria, pageSize, startRow);
     }
 
     /**
